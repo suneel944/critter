@@ -11,7 +11,7 @@ as cloud providers such as BrowserStack and Sauce Labs.
 
 * **Environment agnostic** – select `dev`, `staging` or `prod` via `TEST_ENVIRONMENT` and the framework loads the correct configuration.
 * **Cloud agnostic** – run tests on your own Selenium Grid/Appium servers or on BrowserStack/Sauce Labs.
-* **Modular architecture** – providers implement a common interface and are created via a factory, following adapter and factory design patterns【552692288223628†L8-L13】【731933878383636†L8-L13】.
+* **Modular architecture** – providers implement a common interface and are created via a factory, following adapter and factory design patterns
 * **API, UI and mobile support** – unified test runner coordinates Playwright and WebDriverIO sessions.
 * **TypeScript first** – strict typing via `tsconfig.json` and easy compile with `npm run build`.
 
