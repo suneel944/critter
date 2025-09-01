@@ -1,6 +1,8 @@
 import { test, expect } from '../fixtures/automationExercise';
 import type { Fixtures } from '../fixtures/automationExercise'
+import { ConfigManager } from '../../../src/framework';
 
+const config = ConfigManager.getInstance()
 
 /**
  * End‑to‑end test against AutomationExercise demonstrating a
