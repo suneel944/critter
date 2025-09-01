@@ -11,7 +11,8 @@ const prodConfig: EnvironmentConfig = {
   provider: process.env.PROD_PROVIDER || 'saucelabs',
   user: process.env.PROD_CLOUD_USER,
   key: process.env.PROD_CLOUD_KEY,
-  automationExerciseBaseUrl: 'https://automationexercise.com'
+  automationExerciseBaseUrl: 'https://automationexercise.com',
+  exampleBaseUrl: 'https://www.example.com'
 };
 
 export default prodConfig;
