@@ -20,9 +20,10 @@ test('login, add to cart and proceed to checkout', { tag: '@auto-exr' }, async (
   const password = process.env.AE_PASSWORD || ''
 
   await automationExercise.navigateToFullUrl(config.get('automationExerciseBaseUrl'))
+  await automationExercise.login.goto()
   await automationExercise.login.login(email, password)
-  await automationExercise.productDetails.setQuantity(1)
-  await automationExercise.productDetails.addToCart()
+  await automationExercise.productDetails.goto()
+  await automationExercise.productDetails.addToCart('Blue Top')
   await automationExercise.productDetails.viewCart()
   const containsProduct = await automationExercise.cart.hasProduct('Blue Top')
   expect(containsProduct).toBe(true)

@@ -14,6 +14,9 @@ export class CartPage extends BasePage {
     super(page)
   }
 
+  // Selectors
+  private readonly checkOutButton = '.check_out'
+
   /**
    * Verify that the cart contains a product by its name.  Returns
    * true if at least one row in the cart’s table contains the
@@ -32,6 +35,6 @@ export class CartPage extends BasePage {
    * to login.  Tests should handle the resulting page accordingly.
    */
   async proceedToCheckout(): Promise<void> {
-    await this.page.click('.check_out');
+    await this.page.click(this.checkOutButton);
   }
 }

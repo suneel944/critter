@@ -14,6 +14,13 @@ export class LoginPage extends BasePage {
     super(page)
   }
 
+  // Selectors
+  private readonly loginLink = "a[href='/login']"
+
+  async goto(): Promise<void> {
+    await this.page.click(this.loginLink)
+  }
+
   /**
    * Fill in the login form and submit it.  Assumes that
    * `goto()` has been called beforehand or that the caller
