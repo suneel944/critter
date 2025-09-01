@@ -6,7 +6,7 @@ export type Fixtures = { automationExercise: AutomationExercise };
 
 // @ts-expect-error TS2347 – base is any in this env; ignore generic here
 export const test = base.extend<Fixtures>({
-  ae: async ({ page }: { page: Page }, use: (automationExercise: AutomationExercise) => Promise<void>) => {
+  automationExercise: async ({ page }: { page: Page }, use: (automationExercise: AutomationExercise) => Promise<void>) => {
     const automationExercise = new AutomationExercise(page);
     await use(automationExercise);
   },
