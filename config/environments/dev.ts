@@ -11,7 +11,7 @@ const devConfig: EnvironmentConfig = {
   provider: 'local',
   user: process.env.CLOUD_USER,
   key: process.env.CLOUD_KEY,
-  automationExercise: 'https://automationexercise.com'
+  automationExerciseBaseUrl: 'https://automationexercise.com'
 };
 
 export default devConfig;

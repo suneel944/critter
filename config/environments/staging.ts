@@ -11,7 +11,7 @@ const stagingConfig: EnvironmentConfig = {
   provider: process.env.STAGING_PROVIDER || 'browserstack',
   user: process.env.STAGING_CLOUD_USER,
   key: process.env.STAGING_CLOUD_KEY,
-  automationExercise: 'https://automationexercise.com'
+  automationExerciseBaseUrl: 'https://automationexercise.com'
 };
 
 export default stagingConfig;

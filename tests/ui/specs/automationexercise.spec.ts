@@ -16,17 +16,15 @@ const config = ConfigManager.getInstance()
  * does not handle.
  */
 test('login, add to cart and proceed to checkout', { tag: '@auto-exr' }, async ({ automationExercise }: Fixtures) => {
-  const email = process.env.AE_EMAIL || '';
-  const password = process.env.AE_PASSWORD || '';
+  const email = process.env.AE_EMAIL || ''
+  const password = process.env.AE_PASSWORD || ''
 
-  await automationExercise.navigateToFullUrl('https://automationexercise.com/');
+  await automationExercise.navigateToFullUrl(config.get('automationExerciseBaseUrl'))
   await automationExercise.login.login(email, password)
   await automationExercise.productDetails.setQuantity(1)
   await automationExercise.productDetails.addToCart()
   await automationExercise.productDetails.viewCart()
-
-  // const cartPage = new CartPage(page);
-  // const containsProduct = await cartPage.hasProduct('Blue Top');
-  // expect(containsProduct).toBe(true);
-  // await cartPage.proceedToCheckout();
+  const containsProduct = await automationExercise.cart.hasProduct('Blue Top')
+  expect(containsProduct).toBe(true)
+  await automationExercise.cart.proceedToCheckout()
 });
