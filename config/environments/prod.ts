@@ -1,4 +1,4 @@
-import { EnvironmentConfig } from "../../src/framework/core/ConfigManager"
+import { EnvironmentConfig } from "../../src/framework/core/ConfigManager";
 
 /**
  * Production environment configuration.  Base URLs and provider
@@ -12,7 +12,7 @@ const prodConfig: EnvironmentConfig = {
   automationExerciseBaseUrl: "https://automationexercise.com",
   exampleBaseUrl: "https://www.example.com",
   reqResBaseUrl: "https://reqres.in",
-  reqResApiKey: process.env.REQ_RES_API_KEY
-}
+  reqResApiKey: process.env.REQ_RES_API_KEY,
+};
 
-export default prodConfig
+export default prodConfig;

@@ -13,4 +13,4 @@ export default {
     port: parseInt(process.env.LOCAL_APPIUM_PORT || "4723"),
     path: process.env.LOCAL_APPIUM_PATH || "/wd/hub",
   },
-}
+};
