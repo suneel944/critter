@@ -1,108 +1,112 @@
-import { remote } from 'webdriverio';
-import { DeviceProvider } from './DeviceProvider';
-import ConfigManager from '../ConfigManager';
-import Logger from '../shared/logger';
+import { remote } from "webdriverio"
+import type { Browser } from "webdriverio"
+import type { IDeviceProvider, MobileCapsInput, Platform } from "./IDeviceProvider"
+import ConfigManager from "../core/ConfigManager"
+import Logger from "../shared/logger"
+import { toBuilder, buildCaps, mergeVendor, detectPlatformFromCaps } from "./_caps"
 
 /**
- * BrowserStackProvider connects to BrowserStack using WebdriverIO.  It reads
- * credentials and optional settings from the environment configuration.  The
- * BrowserStack service requires a `user` and `key` to authenticate and
- * optionally supports running tests through a local tunnel using
- * `browserstackLocal`.
+ * Provider implementation for BrowserStack.
+ *
+ * - Creates remote sessions on BrowserStack's cloud grid using WebdriverIO.
+ * - Supports **mobile testing** (Android/iOS) through Appium capabilities.
+ * - Automatically merges framework defaults and vendor-specific options
+ *   (`bstack:options`) while preserving caller-supplied values.
+ *
+ * This provider is designed for use inside Critter’s `DeviceBroker`.
  */
-export class BrowserStackProvider implements DeviceProvider {
-  public readonly name = 'browserstack';
+export class BrowserStackProvider implements IDeviceProvider {
+  /** Logical name of the provider, used in factory selection. */
+  public readonly name = "browserstack"
 
-  private user: string;
-  private key: string;
-  private region?: string;
-  private browserstackLocal?: boolean;
+  private readonly user: string
+  private readonly key: string
+  private readonly region?: string
+  private readonly browserstackLocal: boolean
 
+  /**
+   * Reads BrowserStack credentials and settings from `ConfigManager`
+   * or environment variables (`BROWSERSTACK_USER`, `BROWSERSTACK_KEY`,
+   * `BROWSERSTACK_REGION`, `BROWSERSTACK_LOCAL`).
+   */
   constructor() {
-    const config = ConfigManager.getInstance().getAll();
-    this.user = config.user || process.env.BROWSERSTACK_USER || '';
-    this.key = config.key || process.env.BROWSERSTACK_KEY || '';
-    this.region = process.env.BROWSERSTACK_REGION;
-    this.browserstackLocal = process.env.BROWSERSTACK_LOCAL === 'true';
+    const cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>
+    this.user = (cfg["user"] as string) || process.env.BROWSERSTACK_USER || ""
+    this.key = (cfg["key"] as string) || process.env.BROWSERSTACK_KEY || ""
+    this.region = process.env.BROWSERSTACK_REGION || undefined
+    this.browserstackLocal = process.env.BROWSERSTACK_LOCAL === "true"
   }
 
+  /**
+   * Initialize provider resources.
+   * For BrowserStack this is a no-op, but the hook exists for future
+   * setup (e.g. starting BrowserStack Local binaries).
+   */
   async init(): Promise<void> {
-    // When running with BrowserStackLocal you might start a local binary here.
-    // For simplicity we assume BrowserStack handles this via the wdio service.
-    Logger.debug('Initialising BrowserStackProvider');
-    return;
+    Logger.debug("Initialising BrowserStackProvider")
   }
 
-  async getWebDriver(capabilities: Record<string, any> = {}): Promise<any> {
-    Logger.info('Acquiring BrowserStack web session');
-    const options: any = {
-      protocol: 'https',
-      hostname: this.region ? `${this.region}.browserstack.com` : 'hub.browserstack.com',
+  /**
+   * Acquire a new **mobile driver session** on BrowserStack.
+   *
+   * @param caps - Input capabilities or builder describing the target
+   *               mobile device and app under test.
+   *               The framework auto-detects platform (Android/iOS).
+   * @returns A wrapped session containing the active WebdriverIO `Browser`.
+   *
+   * @remarks
+   * - Caller-provided capabilities are converted to a `CapabilityBuilder`
+   *   and merged with BrowserStack defaults.
+   * - Vendor options (`bstack:options`) include build/session metadata,
+   *   Appium version, and BrowserStack Local flag.
+   * - Uses `detectPlatformFromCaps` to infer `Platform` if not explicit.
+   */
+  async getMobileDriver(caps: MobileCapsInput): Promise<{ driver: Browser }> {
+    const platform: Platform = detectPlatformFromCaps(caps as Record<string, unknown>)
+    const builder = toBuilder(caps, platform)
+
+    mergeVendor(builder, "bstack:options", {
+      local: this.browserstackLocal,
+      buildName: "critter-build",
+      sessionName: platform === "ios" ? "iOS Mobile Test" : "Android Mobile Test",
+      appiumVersion: "2.0.0"
+    })
+
+    const capabilities = buildCaps(builder)
+    const host = this.region ? `${this.region}.browserstack.com` : "hub.browserstack.com"
+
+    Logger.info(`${platform}: Acquiring BrowserStack mobile session`)
+    const driver = await remote({
+      protocol: "https",
+      hostname: host,
       port: 443,
-      path: '/wd/hub',
+      path: "/wd/hub",
       user: this.user,
       key: this.key,
-      capabilities: {
-        'bstack:options': {
-          os: capabilities.os || 'Windows',
-          osVersion: capabilities.osVersion || '10',
-          local: this.browserstackLocal,
-          buildName: capabilities.buildName || 'critter-build',
-          sessionName: capabilities.sessionName || 'UI Test',
-          ...capabilities['bstack:options'],
-        },
-        browserName: capabilities.browserName || 'chrome',
-        browserVersion: capabilities.browserVersion || 'latest',
-        ...capabilities,
-      },
-    };
-    const driver = await remote(options);
-    return driver;
+      capabilities
+    })
+
+    return { driver }
   }
 
-  async getMobileDriver(capabilities: Record<string, any> = {}): Promise<any> {
-    // BrowserStack mobile sessions are similar to web sessions but require
-    // device capabilities.  We still use WebdriverIO remote() with the
-    // appropriate capabilities.
-    Logger.info('Acquiring BrowserStack mobile session');
-    const options: any = {
-      protocol: 'https',
-      hostname: this.region ? `${this.region}.browserstack.com` : 'hub.browserstack.com',
-      port: 443,
-      path: '/wd/hub',
-      user: this.user,
-      key: this.key,
-      capabilities: {
-        'bstack:options': {
-          deviceName: capabilities.deviceName,
-          osVersion: capabilities.osVersion,
-          realMobile: capabilities.realMobile ?? true,
-          local: this.browserstackLocal,
-          buildName: capabilities.buildName || 'critter-build',
-          sessionName: capabilities.sessionName || 'Mobile Test',
-          appiumVersion: capabilities.appiumVersion || '2.0.0',
-          ...capabilities['bstack:options'],
-        },
-        platformName: capabilities.platformName || 'Android',
-        // When testing native apps, supply the BrowserStack uploaded app ID as
-        // `app`.  For web testing, leave `browserName` instead of `app`.
-        ...capabilities,
-      },
-    };
-    const driver = await remote(options);
-    return driver;
-  }
-
-  async releaseDriver(driver: any): Promise<void> {
-    if (driver && typeof driver.deleteSession === 'function') {
-      Logger.debug('Releasing BrowserStack session');
-      await driver.deleteSession();
+  /**
+   * Release a running BrowserStack session.
+   *
+   * @param driver - The WebdriverIO `Browser` instance to terminate.
+   */
+  async releaseDriver(driver: Browser): Promise<void> {
+    if (driver && typeof driver.deleteSession === "function") {
+      Logger.debug("Releasing BrowserStack session")
+      await driver.deleteSession()
     }
   }
 
+  /**
+   * Clean up provider resources.
+   * For BrowserStack this is currently a no-op, but may include
+   * stopping BrowserStack Local or flushing caches.
+   */
   async cleanup(): Promise<void> {
-    // BrowserStack does not require explicit cleanup when using the cloud service.
-    Logger.debug('Cleaning up BrowserStackProvider');
-    return;
+    Logger.debug("Cleaning up BrowserStackProvider")
   }
 }
