@@ -1,15 +1,21 @@
+import { test, expect } from "../../fixtures/session"
+import { CapabilityBuilder } from "../../../src/framework/capabilities/CapabilityBuilder"
+import type { Caps } from "../../../src/framework/capabilities/CapabilityBuilder"
 
-// @ts-nocheck
-// Sample mobile test for the Critter framework.  This test uses the
-// global WebdriverIO runner (browser) and simple assertions to verify that
-// the mobile session is active.  If you wish to use an assertion library
-// like Chai, install it as a dependency and remove this ts-nocheck comment.
-import { expect } from 'chai';
+let caps: Caps
 
-describe('sample mobile test', () => {
-  it('should open the app and check something', async () => {
-    // In WebdriverIO mobile tests, the global `browser` object is used.
-    const activity = await (browser as any).getCurrentActivity?.();
-    expect(activity).to.exist;
-  });
-});
+test.beforeAll(async () => {
+    caps = CapabilityBuilder
+        .android()
+        .browserName("Chrome")
+        .udid("10AD7N1862001AS")
+        .platformVersion("15.0")
+        .build()
+})
+
+test("Can launch Chrome on device", { tag: "@android" },async ({ session }) => {
+  const adapter = await session.mobile(caps, { provider: "local"})
+  await adapter.navigate("https://example.com")
+  const title = String(await adapter.execute("title"))
+  expect(title.toLowerCase()).toContain("example")
+})

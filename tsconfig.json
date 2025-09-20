@@ -10,7 +10,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "types": ["node", "@playwright/test"],
+    "types": ["node", "@playwright/test", "@wdio/globals/types", "@wdio/types"],
     "resolveJsonModule": true
   },
   "include": ["src", "tests", "config", "playwright.config.ts"],

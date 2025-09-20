@@ -1,27 +1,23 @@
-import type { Page } from '@playwright/test'
-import { LoginPage } from './LoginPage'
-import { ProductDetailsPage } from './ProductDetailsPage'
-import { CartPage } from './CartPage'
-import { BasePage } from '../BasePage'
+import type { Page } from "@playwright/test"
+import { LoginPage } from "./LoginPage"
+import { ProductDetailsPage } from "./ProductDetailsPage"
+import { CartPage } from "./CartPage"
+import { BasePage } from "../BasePage"
 
 export class AutomationExercise extends BasePage {
-    
-    constructor(readonly page: Page) {
-        super(page)
-    }
-    
-    private _login?: LoginPage
-    get login(): LoginPage {
-        return (this._login??= new LoginPage(this.page))
-    }
+  constructor(readonly page: Page) {
+    super(page)
+  }
 
-    private _productDetails?: ProductDetailsPage
-    get productDetails(): ProductDetailsPage {
-        return (this._productDetails??= new ProductDetailsPage(this.page))
-    }
+  get login() {
+    return this.getPageObject('login', () => new LoginPage(this.page))
+  }
 
-    private _cart?: CartPage
-    get cart(): CartPage {
-        return (this._cart??=new CartPage(this.page))
-    }
+  get productDetails() {
+    return this.getPageObject('productDetails', () => new ProductDetailsPage(this.page))
+  }
+
+  get cart() {
+    return this.getPageObject('cart', () => new CartPage(this.page))
+  }
 }

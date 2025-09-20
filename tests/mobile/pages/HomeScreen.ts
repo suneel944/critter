@@ -1,4 +1,4 @@
-import { $, browser } from '@wdio/globals';
+import { $ } from "@wdio/globals"
 /**
  * Example Screen Object Model for a mobile home screen using WebdriverIO.
  * Each screen class encapsulates selectors and actions for a particular view
@@ -7,14 +7,18 @@ import { $, browser } from '@wdio/globals';
  */
 export class HomeScreen {
   // Example selectors using Android UiSelector or iOS predicate strings
-  private get menuButton() { return $("~menuButton"); }
-  private get welcomeText() { return $("~welcomeText"); }
+  private get menuButton() {
+    return $("~menuButton")
+  }
+  private get welcomeText() {
+    return $("~welcomeText")
+  }
 
   async isLoaded(): Promise<boolean> {
-    return this.welcomeText.isDisplayed();
+    return this.welcomeText.isDisplayed()
   }
 
   async openMenu(): Promise<void> {
-    await this.menuButton.click();
+    await this.menuButton.click()
   }
 }

@@ -1,31 +1,36 @@
-import { test, expect } from '../fixtures/automationExercise';
-import type { Fixtures } from '../fixtures/automationExercise'
-import { ConfigManager } from '../../../src/framework';
+import { test, expect } from "../../fixtures/session"
+import { ConfigManager } from "../../../src/framework"
+import { AutomationExercise } from "../pages/automation-exercise/AutomationExercise"
 
-const config = ConfigManager.getInstance()
+let config: ConfigManager
+
+test.beforeAll(async () => {
+  config = ConfigManager.getInstance()
+})
 
 /**
  * End‑to‑end test against AutomationExercise demonstrating a
- * login, add‑to‑cart and checkout flow.  The test uses
- * page object models defined in the pages directory to
- * encapsulate page interactions.  To run this test you
- * should set the environment variables AE_EMAIL and
- * AE_PASSWORD to a valid account on the site.  If the user
- * is not logged in when proceeding to checkout, the site
- * will display a modal prompting for login, which this test
- * does not handle.
+ * login, add‑to‑cart and checkout flow.
  */
-test('login, add to cart and proceed to checkout', { tag: '@auto-exr' }, async ({ automationExercise }: Fixtures) => {
-  const email = process.env.AE_EMAIL || ''
-  const password = process.env.AE_PASSWORD || ''
+test(
+  "login, add to cart and proceed to checkout",
+  { tag: "@auto-exr" },
+  async ({ session }) => {
+    const email = process.env.AE_EMAIL as string
+    const password = process.env.AE_PASSWORD as string
+    const automationExercise = await session.pages(AutomationExercise)
 
-  await automationExercise.navigateToFullUrl(config.get('automationExerciseBaseUrl'))
-  await automationExercise.login.goto()
-  await automationExercise.login.login(email, password)
-  await automationExercise.productDetails.goto()
-  await automationExercise.productDetails.addToCart('Blue Top')
-  await automationExercise.productDetails.viewCart()
-  const containsProduct = await automationExercise.cart.hasProduct('Blue Top')
-  expect(containsProduct).toBe(true)
-  await automationExercise.cart.proceedToCheckout()
-});
+    await automationExercise.navigateToFullUrl(
+      config.get("automationExerciseBaseUrl") as string,
+    )
+    await automationExercise.login.goto()
+    await automationExercise.login.login(email, password)
+    await automationExercise.productDetails.goto()
+    await automationExercise.productDetails.addToCart("Blue Top")
+    await automationExercise.productDetails.viewCart()
+    const containsProduct =
+      await automationExercise.cart.hasProduct("Blue Top")
+    expect(containsProduct).toBe(true)
+    await automationExercise.cart.proceedToCheckout()
+  },
+)
