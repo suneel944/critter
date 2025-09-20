@@ -1,9 +1,18 @@
-import { remote } from "webdriverio"
-import type { Browser } from "webdriverio"
-import type { IDeviceProvider, MobileCapsInput, Platform } from "./IDeviceProvider"
-import ConfigManager from "../core/ConfigManager"
-import Logger from "../shared/logger"
-import { toBuilder, buildCaps, mergeVendor, detectPlatformFromCaps } from "./_caps"
+import { remote } from "webdriverio";
+import type { Browser } from "webdriverio";
+import type {
+  IDeviceProvider,
+  MobileCapsInput,
+  Platform,
+} from "./IDeviceProvider";
+import ConfigManager from "../core/ConfigManager";
+import Logger from "../shared/logger";
+import {
+  toBuilder,
+  buildCaps,
+  mergeVendor,
+  detectPlatformFromCaps,
+} from "./_caps";
 
 /**
  * Provider implementation for BrowserStack.
@@ -17,12 +26,12 @@ import { toBuilder, buildCaps, mergeVendor, detectPlatformFromCaps } from "./_ca
  */
 export class BrowserStackProvider implements IDeviceProvider {
   /** Logical name of the provider, used in factory selection. */
-  public readonly name = "browserstack"
+  public readonly name = "browserstack";
 
-  private readonly user: string
-  private readonly key: string
-  private readonly region?: string
-  private readonly browserstackLocal: boolean
+  private readonly user: string;
+  private readonly key: string;
+  private readonly region?: string;
+  private readonly browserstackLocal: boolean;
 
   /**
    * Reads BrowserStack credentials and settings from `ConfigManager`
@@ -30,11 +39,11 @@ export class BrowserStackProvider implements IDeviceProvider {
    * `BROWSERSTACK_REGION`, `BROWSERSTACK_LOCAL`).
    */
   constructor() {
-    const cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>
-    this.user = (cfg["user"] as string) || process.env.BROWSERSTACK_USER || ""
-    this.key = (cfg["key"] as string) || process.env.BROWSERSTACK_KEY || ""
-    this.region = process.env.BROWSERSTACK_REGION || undefined
-    this.browserstackLocal = process.env.BROWSERSTACK_LOCAL === "true"
+    const cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>;
+    this.user = (cfg["user"] as string) || process.env.BROWSERSTACK_USER || "";
+    this.key = (cfg["key"] as string) || process.env.BROWSERSTACK_KEY || "";
+    this.region = process.env.BROWSERSTACK_REGION || undefined;
+    this.browserstackLocal = process.env.BROWSERSTACK_LOCAL === "true";
   }
 
   /**
@@ -43,7 +52,7 @@ export class BrowserStackProvider implements IDeviceProvider {
    * setup (e.g. starting BrowserStack Local binaries).
    */
   async init(): Promise<void> {
-    Logger.debug("Initialising BrowserStackProvider")
+    Logger.debug("Initialising BrowserStackProvider");
   }
 
   /**
@@ -62,20 +71,25 @@ export class BrowserStackProvider implements IDeviceProvider {
    * - Uses `detectPlatformFromCaps` to infer `Platform` if not explicit.
    */
   async getMobileDriver(caps: MobileCapsInput): Promise<{ driver: Browser }> {
-    const platform: Platform = detectPlatformFromCaps(caps as Record<string, unknown>)
-    const builder = toBuilder(caps, platform)
+    const platform: Platform = detectPlatformFromCaps(
+      caps as Record<string, unknown>,
+    );
+    const builder = toBuilder(caps, platform);
 
     mergeVendor(builder, "bstack:options", {
       local: this.browserstackLocal,
       buildName: "critter-build",
-      sessionName: platform === "ios" ? "iOS Mobile Test" : "Android Mobile Test",
-      appiumVersion: "2.0.0"
-    })
+      sessionName:
+        platform === "ios" ? "iOS Mobile Test" : "Android Mobile Test",
+      appiumVersion: "2.0.0",
+    });
 
-    const capabilities = buildCaps(builder)
-    const host = this.region ? `${this.region}.browserstack.com` : "hub.browserstack.com"
+    const capabilities = buildCaps(builder);
+    const host = this.region
+      ? `${this.region}.browserstack.com`
+      : "hub.browserstack.com";
 
-    Logger.info(`${platform}: Acquiring BrowserStack mobile session`)
+    Logger.info(`${platform}: Acquiring BrowserStack mobile session`);
     const driver = await remote({
       protocol: "https",
       hostname: host,
@@ -83,10 +97,10 @@ export class BrowserStackProvider implements IDeviceProvider {
       path: "/wd/hub",
       user: this.user,
       key: this.key,
-      capabilities
-    })
+      capabilities,
+    });
 
-    return { driver }
+    return { driver };
   }
 
   /**
@@ -96,8 +110,8 @@ export class BrowserStackProvider implements IDeviceProvider {
    */
   async releaseDriver(driver: Browser): Promise<void> {
     if (driver && typeof driver.deleteSession === "function") {
-      Logger.debug("Releasing BrowserStack session")
-      await driver.deleteSession()
+      Logger.debug("Releasing BrowserStack session");
+      await driver.deleteSession();
     }
   }
 
@@ -107,6 +121,6 @@ export class BrowserStackProvider implements IDeviceProvider {
    * stopping BrowserStack Local or flushing caches.
    */
   async cleanup(): Promise<void> {
-    Logger.debug("Cleaning up BrowserStackProvider")
+    Logger.debug("Cleaning up BrowserStackProvider");
   }
 }

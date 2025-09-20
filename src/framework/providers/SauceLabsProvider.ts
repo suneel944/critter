@@ -1,9 +1,18 @@
-import { remote } from "webdriverio"
-import type { Browser } from "webdriverio"
-import type { IDeviceProvider, MobileCapsInput, Platform } from "./IDeviceProvider"
-import ConfigManager from "../core/ConfigManager"
-import Logger from "../shared/logger"
-import { toBuilder, detectPlatformFromCaps, buildCaps, mergeVendor } from "./_caps"
+import { remote } from "webdriverio";
+import type { Browser } from "webdriverio";
+import type {
+  IDeviceProvider,
+  MobileCapsInput,
+  Platform,
+} from "./IDeviceProvider";
+import ConfigManager from "../core/ConfigManager";
+import Logger from "../shared/logger";
+import {
+  toBuilder,
+  detectPlatformFromCaps,
+  buildCaps,
+  mergeVendor,
+} from "./_caps";
 
 /**
  * Provider implementation for Sauce Labs.
@@ -18,12 +27,12 @@ import { toBuilder, detectPlatformFromCaps, buildCaps, mergeVendor } from "./_ca
  */
 export class SauceLabsProvider implements IDeviceProvider {
   /** Logical name of the provider, used in factory selection. */
-  public readonly name = "saucelabs"
+  public readonly name = "saucelabs";
 
-  private readonly user: string
-  private readonly key: string
-  private readonly region: string
-  private readonly sauceConnect: boolean
+  private readonly user: string;
+  private readonly key: string;
+  private readonly region: string;
+  private readonly sauceConnect: boolean;
 
   /**
    * Reads Sauce Labs credentials and settings from `ConfigManager`
@@ -35,11 +44,11 @@ export class SauceLabsProvider implements IDeviceProvider {
    * - `SAUCE_TUNNEL_IDENTIFIER` (optional tunnel ID)
    */
   constructor() {
-    const cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>
-    this.user = (cfg["user"] as string) || process.env.SAUCE_USERNAME || ""
-    this.key = (cfg["key"] as string) || process.env.SAUCE_ACCESS_KEY || ""
-    this.region = process.env.SAUCE_REGION || "us-west-1"
-    this.sauceConnect = process.env.SAUCE_CONNECT === "true"
+    const cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>;
+    this.user = (cfg["user"] as string) || process.env.SAUCE_USERNAME || "";
+    this.key = (cfg["key"] as string) || process.env.SAUCE_ACCESS_KEY || "";
+    this.region = process.env.SAUCE_REGION || "us-west-1";
+    this.sauceConnect = process.env.SAUCE_CONNECT === "true";
   }
 
   /**
@@ -48,7 +57,7 @@ export class SauceLabsProvider implements IDeviceProvider {
    * of credentials or starting a local Sauce Connect process.
    */
   async init(): Promise<void> {
-    Logger.debug("Initialising SauceLabsProvider")
+    Logger.debug("Initialising SauceLabsProvider");
   }
 
   /**
@@ -65,19 +74,23 @@ export class SauceLabsProvider implements IDeviceProvider {
    * - Caller-supplied caps always override defaults.
    */
   async getMobileDriver(caps: MobileCapsInput): Promise<{ driver: Browser }> {
-    const platform: Platform = detectPlatformFromCaps((caps as Record<string, unknown>))
-    const builder = toBuilder(caps, platform)
+    const platform: Platform = detectPlatformFromCaps(
+      caps as Record<string, unknown>,
+    );
+    const builder = toBuilder(caps, platform);
 
     mergeVendor(builder, "sauce:options", {
       build: "critter-build",
       name: platform === "ios" ? "iOS Mobile Test" : "Android Mobile Test",
-      tunnelIdentifier: this.sauceConnect ? process.env.SAUCE_TUNNEL_IDENTIFIER : undefined
-    })
+      tunnelIdentifier: this.sauceConnect
+        ? process.env.SAUCE_TUNNEL_IDENTIFIER
+        : undefined,
+    });
 
-    const capabilities = buildCaps(builder)
-    const host = `${this.region}.saucelabs.com`
+    const capabilities = buildCaps(builder);
+    const host = `${this.region}.saucelabs.com`;
 
-    Logger.info(`${platform}: Acquiring Sauce Labs mobile session`)
+    Logger.info(`${platform}: Acquiring Sauce Labs mobile session`);
     const driver = await remote({
       protocol: "https",
       hostname: host,
@@ -85,10 +98,10 @@ export class SauceLabsProvider implements IDeviceProvider {
       path: "/wd/hub",
       user: this.user,
       key: this.key,
-      capabilities
-    })
+      capabilities,
+    });
 
-    return { driver }
+    return { driver };
   }
 
   /**
@@ -98,8 +111,8 @@ export class SauceLabsProvider implements IDeviceProvider {
    */
   async releaseDriver(driver: Browser): Promise<void> {
     if (driver && typeof driver.deleteSession === "function") {
-      Logger.debug("Releasing Sauce Labs session")
-      await driver.deleteSession()
+      Logger.debug("Releasing Sauce Labs session");
+      await driver.deleteSession();
     }
   }
 
@@ -109,6 +122,6 @@ export class SauceLabsProvider implements IDeviceProvider {
    * Sauce Connect tunnel or cleaning up temporary state.
    */
   async cleanup(): Promise<void> {
-    Logger.debug("Cleaning up SauceLabsProvider")
+    Logger.debug("Cleaning up SauceLabsProvider");
   }
 }

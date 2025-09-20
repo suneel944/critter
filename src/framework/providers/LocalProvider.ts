@@ -1,9 +1,13 @@
-import { remote } from "webdriverio"
-import type { Browser } from "webdriverio"
-import type { IDeviceProvider, MobileCapsInput, Platform } from "./IDeviceProvider"
-import ConfigManager from "../core/ConfigManager"
-import Logger from "../shared/logger"
-import { toBuilder, detectPlatformFromCaps, buildCaps } from "./_caps"
+import { remote } from "webdriverio";
+import type { Browser } from "webdriverio";
+import type {
+  IDeviceProvider,
+  MobileCapsInput,
+  Platform,
+} from "./IDeviceProvider";
+import ConfigManager from "../core/ConfigManager";
+import Logger from "../shared/logger";
+import { toBuilder, detectPlatformFromCaps, buildCaps } from "./_caps";
 
 /**
  * Provider implementation for local environments.
@@ -22,10 +26,10 @@ import { toBuilder, detectPlatformFromCaps, buildCaps } from "./_caps"
  */
 export class LocalProvider implements IDeviceProvider {
   /** Logical name of the provider, used in factory selection. */
-  public readonly name = "local"
-  private readonly appiumHost: string
-  private readonly appiumPort: number
-  private readonly appiumPath: string
+  public readonly name = "local";
+  private readonly appiumHost: string;
+  private readonly appiumPort: number;
+  private readonly appiumPath: string;
 
   /**
    * Reads connection details for local WebDriver and Appium servers
@@ -34,10 +38,13 @@ export class LocalProvider implements IDeviceProvider {
    * - `LOCAL_APPIUM_HOST`, `LOCAL_APPIUM_PORT`, `LOCAL_APPIUM_PATH`
    */
   constructor() {
-    ConfigManager.getInstance().getAll()
-    this.appiumHost = process.env.LOCAL_APPIUM_HOST || "localhost"
-    this.appiumPort = Number.parseInt(process.env.LOCAL_APPIUM_PORT || "4723", 10)
-    this.appiumPath = process.env.LOCAL_APPIUM_PATH || "/wd/hub"
+    ConfigManager.getInstance().getAll();
+    this.appiumHost = process.env.LOCAL_APPIUM_HOST || "localhost";
+    this.appiumPort = Number.parseInt(
+      process.env.LOCAL_APPIUM_PORT || "4723",
+      10,
+    );
+    this.appiumPath = process.env.LOCAL_APPIUM_PATH || "/wd/hub";
   }
 
   /**
@@ -46,7 +53,7 @@ export class LocalProvider implements IDeviceProvider {
    * (e.g. verifying server availability).
    */
   async init(): Promise<void> {
-    Logger.debug("Initializing LocalProvider")
+    Logger.debug("Initializing LocalProvider");
   }
 
   /**
@@ -62,18 +69,20 @@ export class LocalProvider implements IDeviceProvider {
    * - Connects to the local Appium host/port configured via environment variables.
    */
   async getMobileDriver(caps: MobileCapsInput): Promise<{ driver: Browser }> {
-    Logger.info("Acquiring local mobile driver session")
-    const platform: Platform = detectPlatformFromCaps((caps as Record<string, unknown>))
-    const builder = toBuilder(caps, platform)
-    const capabilities = buildCaps(builder)
+    Logger.info("Acquiring local mobile driver session");
+    const platform: Platform = detectPlatformFromCaps(
+      caps as Record<string, unknown>,
+    );
+    const builder = toBuilder(caps, platform);
+    const capabilities = buildCaps(builder);
 
     const driver = await remote({
       hostname: this.appiumHost,
       port: this.appiumPort,
       path: this.appiumPath,
-      capabilities
-    })
-    return { driver }
+      capabilities,
+    });
+    return { driver };
   }
 
   /**
@@ -83,8 +92,8 @@ export class LocalProvider implements IDeviceProvider {
    */
   async releaseDriver(driver: Browser): Promise<void> {
     if (driver && typeof driver.deleteSession === "function") {
-      Logger.debug("Releasing local driver session")
-      await driver.deleteSession()
+      Logger.debug("Releasing local driver session");
+      await driver.deleteSession();
     }
   }
 
@@ -94,6 +103,6 @@ export class LocalProvider implements IDeviceProvider {
    * stopping emulators or clearing temp files.
    */
   async cleanup(): Promise<void> {
-    Logger.debug("Cleaning up LocalProvider")
+    Logger.debug("Cleaning up LocalProvider");
   }
 }
