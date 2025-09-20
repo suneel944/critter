@@ -1,88 +1,99 @@
-import { remote } from 'webdriverio';
-import { DeviceProvider } from './DeviceProvider';
-import ConfigManager from '../ConfigManager';
-import Logger from '../shared/logger';
+import { remote } from "webdriverio"
+import type { Browser } from "webdriverio"
+import type { IDeviceProvider, MobileCapsInput, Platform } from "./IDeviceProvider"
+import ConfigManager from "../core/ConfigManager"
+import Logger from "../shared/logger"
+import { toBuilder, detectPlatformFromCaps, buildCaps } from "./_caps"
 
 /**
- * LocalProvider uses a locally hosted Selenium Grid and Appium servers to
- * provide browser and mobile sessions.  It reads host/port information from
- * environment variables to remain cloud agnostic.  Selenium Grid Helm charts
- * can be installed into any Kubernetes cluster to enable this local farm.
+ * Provider implementation for local environments.
+ *
+ * - Connects to a locally running **Selenium Grid** (for web) or
+ *   **Appium server** (for mobile).
+ * - Reads host/port/path configuration from environment variables,
+ *   falling back to sensible defaults.
+ *
+ * Defaults:
+ * - WebDriver: `localhost:4444/wd/hub`
+ * - Appium: `localhost:4723/wd/hub`
+ *
+ * This provider is designed for running Critter against a developer
+ * machine or an on-premise device farm.
  */
-export class LocalProvider implements DeviceProvider {
-  public readonly name = 'local';
+export class LocalProvider implements IDeviceProvider {
+  /** Logical name of the provider, used in factory selection. */
+  public readonly name = "local"
+  private readonly appiumHost: string
+  private readonly appiumPort: number
+  private readonly appiumPath: string
 
-  private webdriverHost: string;
-  private webdriverPort: number;
-  private webdriverPath: string;
-  private appiumHost: string;
-  private appiumPort: number;
-  private appiumPath: string;
-
+  /**
+   * Reads connection details for local WebDriver and Appium servers
+   * from environment variables, with defaults if not set:
+   * - `LOCAL_WEBDRIVER_HOST`, `LOCAL_WEBDRIVER_PORT`, `LOCAL_WEBDRIVER_PATH`
+   * - `LOCAL_APPIUM_HOST`, `LOCAL_APPIUM_PORT`, `LOCAL_APPIUM_PATH`
+   */
   constructor() {
-    // Access configuration so the provider instance can adapt based on environment
-    ConfigManager.getInstance().getAll();
-    // Fallback to sensible defaults if not provided via environment variables
-    this.webdriverHost = process.env.LOCAL_WEBDRIVER_HOST || 'localhost';
-    this.webdriverPort = parseInt(process.env.LOCAL_WEBDRIVER_PORT || '4444');
-    this.webdriverPath = process.env.LOCAL_WEBDRIVER_PATH || '/wd/hub';
-    this.appiumHost = process.env.LOCAL_APPIUM_HOST || 'localhost';
-    this.appiumPort = parseInt(process.env.LOCAL_APPIUM_PORT || '4723');
-    this.appiumPath = process.env.LOCAL_APPIUM_PATH || '/wd/hub';
+    ConfigManager.getInstance().getAll()
+    this.appiumHost = process.env.LOCAL_APPIUM_HOST || "localhost"
+    this.appiumPort = Number.parseInt(process.env.LOCAL_APPIUM_PORT || "4723", 10)
+    this.appiumPath = process.env.LOCAL_APPIUM_PATH || "/wd/hub"
   }
 
+  /**
+   * Initialize provider resources.
+   * For local use this is a no-op, but may be extended in future
+   * (e.g. verifying server availability).
+   */
   async init(): Promise<void> {
-    // Nothing to initialise for local provider.  In a real implementation this
-    // method could verify the grid and appium servers are reachable.
-    Logger.debug('Initialising LocalProvider');
-    return;
+    Logger.debug("Initializing LocalProvider")
   }
 
-  async getWebDriver(capabilities: Record<string, any> = {}): Promise<any> {
-    Logger.info('Acquiring local WebDriver session');
-    const options: any = {
-      hostname: this.webdriverHost,
-      port: this.webdriverPort,
-      path: this.webdriverPath,
-      capabilities: {
-        browserName: capabilities.browserName || 'chrome',
-        ...capabilities,
-      },
-    };
-    const driver = await remote(options);
-    return driver;
-  }
+  /**
+   * Acquire a new **local mobile driver session** via Appium.
+   *
+   * @param caps - Input capabilities or builder describing the target
+   *               local device/emulator and app under test.
+   * @returns A wrapped session containing the active WebdriverIO `Browser`.
+   *
+   * @remarks
+   * - Uses `detectPlatformFromCaps` to infer whether the session is Android/iOS.
+   * - Builds capabilities through the framework’s `CapabilityBuilder`.
+   * - Connects to the local Appium host/port configured via environment variables.
+   */
+  async getMobileDriver(caps: MobileCapsInput): Promise<{ driver: Browser }> {
+    Logger.info("Acquiring local mobile driver session")
+    const platform: Platform = detectPlatformFromCaps((caps as Record<string, unknown>))
+    const builder = toBuilder(caps, platform)
+    const capabilities = buildCaps(builder)
 
-  async getMobileDriver(capabilities: Record<string, any> = {}): Promise<any> {
-    Logger.info('Acquiring local mobile driver session');
-    const options: any = {
+    const driver = await remote({
       hostname: this.appiumHost,
       port: this.appiumPort,
       path: this.appiumPath,
-      // Appium expects the capabilities inside the `capabilities` key when
-      // connecting through the WebdriverIO `remote()` API
-      capabilities: {
-        platformName: capabilities.platformName || 'Android',
-        automationName: capabilities.automationName || 'UiAutomator2',
-        // Additional capabilities like deviceName, app, udid can be passed in
-        ...capabilities,
-      },
-    };
-    const driver = await remote(options);
-    return driver;
+      capabilities
+    })
+    return { driver }
   }
 
-  async releaseDriver(driver: any): Promise<void> {
-    if (driver && typeof driver.deleteSession === 'function') {
-      Logger.debug('Releasing local driver session');
-      await driver.deleteSession();
+  /**
+   * Release a running local WebDriver/Appium session.
+   *
+   * @param driver - The WebdriverIO `Browser` instance to terminate.
+   */
+  async releaseDriver(driver: Browser): Promise<void> {
+    if (driver && typeof driver.deleteSession === "function") {
+      Logger.debug("Releasing local driver session")
+      await driver.deleteSession()
     }
   }
 
+  /**
+   * Clean up provider resources.
+   * For local use this is a no-op, but could include tasks like
+   * stopping emulators or clearing temp files.
+   */
   async cleanup(): Promise<void> {
-    // No global resources to clean up for local provider.  If you spawn
-    // processes in init() then terminate them here.
-    Logger.debug('Cleaning up LocalProvider');
-    return;
+    Logger.debug("Cleaning up LocalProvider")
   }
 }
