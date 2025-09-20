@@ -22,6 +22,8 @@ const scopeAnyPreset = (presetMaybeArray, scope) => {
   return arr.map((p) => scopePreset(p, scope))
 }
 
+const pwRecommended = playwright.configs['flat/recommended']
+
 export default [
   // ignore build/vendor
   { ignores: ['node_modules', 'dist', 'build', 'coverage'] },
@@ -44,15 +46,13 @@ export default [
     },
   }),
 
-  // Calm down the noisiest rules globally (still typed)
+  // tone down a few noisy rules globally
   {
     files: ['**/*.{ts,tsx}'],
     rules: {
       'no-unused-vars': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
       '@typescript-eslint/require-await': 'off',
-
-      // keep these as warnings while types are tightened
       '@typescript-eslint/no-unsafe-assignment': 'warn',
       '@typescript-eslint/no-unsafe-call': 'warn',
       '@typescript-eslint/no-unsafe-member-access': 'warn',
@@ -61,19 +61,19 @@ export default [
     },
   },
 
-  // Playwright recommended for test files only
-  ...scopeAnyPreset(playwright.configs['flat/recommended'], {
-    files: ['tests/**/*.{ts,tsx}', '**/*.{spec,test}.{ts,tsx}', 'playwright.config.ts'],
-  }),
-
-  // Extra Playwright rule tuning (must declare plugin in same block)
+  // Playwright: declare plugin ONCE via recommended preset, scoped to tests
   {
-    files: ['tests/**/*.{ts,tsx}', '**/*.{spec,test}.{ts,tsx}'],
-    plugins: { playwright },
+    ...pwRecommended,
+    files: ['tests/**/*.{ts,tsx}', '**/*.{spec,test}.{ts,tsx}', 'playwright.config.ts'],
     rules: {
+      ...(pwRecommended.rules ?? {}),
+      // use the correct option name: assertFunctionNames
       'playwright/expect-expect': [
         'error',
-        { additionalAssertFunctionNames: ['expectStatus', 'validateSchema'] },
+        {
+          // include default 'expect' plus your helpers
+          assertFunctionNames: ['expect', 'expectStatus', 'validateSchema'],
+        },
       ],
     },
   },
