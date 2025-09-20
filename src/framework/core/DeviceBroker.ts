@@ -1,8 +1,12 @@
-import ProviderFactory from "../core/ProviderFactory"
-import type { IDeviceProvider, ProviderOptions, MobileSession } from "../providers/IDeviceProvider"
-import { AppiumAdapter } from "../adapters/AppiumAdapter"
-import type { IAdapter } from "../adapters/IAdapter"
-import type { Browser } from "webdriverio"
+import ProviderFactory from "../core/ProviderFactory";
+import type {
+  IDeviceProvider,
+  ProviderOptions,
+  MobileSession,
+} from "../providers/IDeviceProvider";
+import { AppiumAdapter } from "../adapters/AppiumAdapter";
+import type { IAdapter } from "../adapters/IAdapter";
+import type { Browser } from "webdriverio";
 
 /**
  * The `DeviceBroker` is the orchestration layer between providers
@@ -19,15 +23,15 @@ import type { Browser } from "webdriverio"
  * driver instantiation, and adapter binding.
  */
 export default class DeviceBroker {
-  private provider: IDeviceProvider
-  private initialised = false
+  private provider: IDeviceProvider;
+  private initialised = false;
 
   /**
    * Constructs a `DeviceBroker` by retrieving the correct provider
    * (local, BrowserStack, Sauce Labs) from {@link ProviderFactory}.
    */
   constructor() {
-    this.provider = ProviderFactory.getProvider()
+    this.provider = ProviderFactory.getProvider();
   }
 
   /**
@@ -39,8 +43,8 @@ export default class DeviceBroker {
    */
   private async ensureInit(): Promise<void> {
     if (!this.initialised) {
-      await this.provider.init()
-      this.initialised = true
+      await this.provider.init();
+      this.initialised = true;
     }
   }
 
@@ -59,11 +63,11 @@ export default class DeviceBroker {
    * ```
    */
   public async getMobileAdapter(options: ProviderOptions): Promise<IAdapter> {
-    await this.ensureInit()
-    const session: MobileSession = await this.provider.getMobileDriver(options)
-    const adapter = new AppiumAdapter()
-    await adapter.bind(session)
-    return adapter
+    await this.ensureInit();
+    const session: MobileSession = await this.provider.getMobileDriver(options);
+    const adapter = new AppiumAdapter();
+    await adapter.bind(session);
+    return adapter;
   }
 
   /**
@@ -76,9 +80,11 @@ export default class DeviceBroker {
    * This method exists for legacy code or advanced cases where direct
    * WebdriverIO access is required. Prefer {@link getMobileAdapter}.
    */
-  public async getMobileDriver(options: ProviderOptions): Promise<MobileSession> {
-    await this.ensureInit()
-    return this.provider.getMobileDriver(options)
+  public async getMobileDriver(
+    options: ProviderOptions,
+  ): Promise<MobileSession> {
+    await this.ensureInit();
+    return this.provider.getMobileDriver(options);
   }
 
   /**
@@ -87,7 +93,7 @@ export default class DeviceBroker {
    * @param driver - The WebdriverIO `Browser` instance to terminate.
    */
   public async releaseDriver(driver: Browser): Promise<void> {
-    await this.provider.releaseDriver(driver)
+    await this.provider.releaseDriver(driver);
   }
 
   /**
@@ -98,7 +104,7 @@ export default class DeviceBroker {
    * - Safe to call multiple times (initialization is idempotent).
    */
   public async cleanup(): Promise<void> {
-    await this.ensureInit()
-    await this.provider.cleanup()
+    await this.ensureInit();
+    await this.provider.cleanup();
   }
 }

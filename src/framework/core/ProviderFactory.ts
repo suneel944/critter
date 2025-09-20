@@ -1,8 +1,8 @@
-import { IDeviceProvider } from "../providers/IDeviceProvider"
-import { LocalProvider } from "../providers/LocalProvider"
-import { BrowserStackProvider } from "../providers/BrowserStackProvider"
-import { SauceLabsProvider } from "../providers/SauceLabsProvider"
-import ConfigManager from "../core/ConfigManager"
+import { IDeviceProvider } from "../providers/IDeviceProvider";
+import { LocalProvider } from "../providers/LocalProvider";
+import { BrowserStackProvider } from "../providers/BrowserStackProvider";
+import { SauceLabsProvider } from "../providers/SauceLabsProvider";
+import ConfigManager from "../core/ConfigManager";
 
 /**
  * Factory responsible for creating and returning {@link IDeviceProvider}
@@ -23,7 +23,7 @@ export default class ProviderFactory {
    * @internal
    * Used to enforce a singleton lifecycle for each provider implementation.
    */
-  private static instances: Map<string, IDeviceProvider> = new Map()
+  private static instances: Map<string, IDeviceProvider> = new Map();
 
   /**
    * Returns a configured {@link IDeviceProvider} for the current environment.
@@ -47,28 +47,28 @@ export default class ProviderFactory {
    * ```
    */
   public static getProvider(): IDeviceProvider {
-    const config = ConfigManager.getInstance().getAll()
-    const providerName = (config.provider || "local").toLowerCase()
+    const config = ConfigManager.getInstance().getAll();
+    const providerName = (config.provider || "local").toLowerCase();
 
     if (ProviderFactory.instances.has(providerName)) {
-      return ProviderFactory.instances.get(providerName)!
+      return ProviderFactory.instances.get(providerName)!;
     }
 
-    let provider: IDeviceProvider
+    let provider: IDeviceProvider;
     switch (providerName) {
       case "browserstack":
-        provider = new BrowserStackProvider()
-        break
+        provider = new BrowserStackProvider();
+        break;
       case "saucelabs":
       case "sauce":
-        provider = new SauceLabsProvider()
-        break
+        provider = new SauceLabsProvider();
+        break;
       case "local":
       default:
-        provider = new LocalProvider()
-        break
+        provider = new LocalProvider();
+        break;
     }
-    ProviderFactory.instances.set(providerName, provider)
-    return provider
+    ProviderFactory.instances.set(providerName, provider);
+    return provider;
   }
 }
