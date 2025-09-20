@@ -1,15 +1,15 @@
-import type { APIResponse } from "playwright"
-import ApiClient from "./clients/ApiClient"
-import type { BuiltRequest } from "./builders/RequestBuilder"
+import type { APIResponse } from "playwright";
+import ApiClient from "./clients/ApiClient";
+import type { BuiltRequest } from "./builders/RequestBuilder";
 
 /**
  * Initialization contract for creating an {@link ApiClient}.
  */
 export interface ClientInit {
   /** Base URL applied to all requests issued by this client. */
-  baseURL: string
+  baseURL: string;
   /** Default headers applied to every request unless overridden. */
-  defaultHeaders: Record<string, string>
+  defaultHeaders: Record<string, string>;
 }
 
 /**
@@ -23,7 +23,9 @@ export interface ClientInit {
  * (HTTP methods in this case) are covered.
  */
 function assertUnreachable(x: never): never {
-  throw new Error(`ApiClientFactory.send: unsupported HTTP method ${String(x)}`)
+  throw new Error(
+    `ApiClientFactory.send: unsupported HTTP method ${String(x)}`,
+  );
 }
 
 /**
@@ -52,7 +54,10 @@ export default class ApiClientFactory {
    * ```
    */
   static create(init: ClientInit): ApiClient {
-    return new ApiClient({ baseURL: init.baseURL, defaultHeaders: init.defaultHeaders })
+    return new ApiClient({
+      baseURL: init.baseURL,
+      defaultHeaders: init.defaultHeaders,
+    });
   }
 
   /**
@@ -78,18 +83,29 @@ export default class ApiClientFactory {
    * expect(response.status()).toBe(201)
    * ```
    */
-  static async send(client: ApiClient, req: BuiltRequest): Promise<APIResponse> {
-    const { method, path, options } = req
+  static async send(
+    client: ApiClient,
+    req: BuiltRequest,
+  ): Promise<APIResponse> {
+    const { method, path, options } = req;
 
     switch (method) {
-      case "GET":     return client.get(path,     options)
-      case "POST":    return client.post(path,    options)
-      case "PUT":     return client.put(path,     options)
-      case "DELETE":  return client.delete(path,  options)
-      case "PATCH":   return client.patch(path,   options)
-      case "HEAD":    return client.head(path,    options)
-      case "OPTIONS": return client.options(path, options)
-      default:        return assertUnreachable(method)
+      case "GET":
+        return client.get(path, options);
+      case "POST":
+        return client.post(path, options);
+      case "PUT":
+        return client.put(path, options);
+      case "DELETE":
+        return client.delete(path, options);
+      case "PATCH":
+        return client.patch(path, options);
+      case "HEAD":
+        return client.head(path, options);
+      case "OPTIONS":
+        return client.options(path, options);
+      default:
+        return assertUnreachable(method);
     }
   }
 }
