@@ -1,4 +1,4 @@
-import { EnvironmentConfig } from '../../src/framework/ConfigManager';
+import { EnvironmentConfig } from "../../src/framework/core/ConfigManager";
 
 /**
  * Production environment configuration.  Base URLs and provider
@@ -6,13 +6,13 @@ import { EnvironmentConfig } from '../../src/framework/ConfigManager';
  * here serve only as fallbacks.
  */
 const prodConfig: EnvironmentConfig = {
-  baseUrl: process.env.PROD_BASE_URL || 'https://www.example.com',
-  apiUrl: process.env.PROD_API_URL || 'https://api.example.com',
-  provider: process.env.PROD_PROVIDER || 'saucelabs',
+  provider: process.env.PROD_PROVIDER || "saucelabs",
   user: process.env.PROD_CLOUD_USER,
   key: process.env.PROD_CLOUD_KEY,
-  automationExerciseBaseUrl: 'https://automationexercise.com',
-  exampleBaseUrl: 'https://www.example.com'
+  automationExerciseBaseUrl: "https://automationexercise.com",
+  exampleBaseUrl: "https://www.example.com",
+  reqResBaseUrl: "https://reqres.in",
+  reqResApiKey: process.env.REQ_RES_API_KEY,
 };
 
 export default prodConfig;

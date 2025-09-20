@@ -1,5 +1,5 @@
-import { Page } from '@playwright/test';
-import { BasePage } from '../BasePage';
+import { Page } from "@playwright/test";
+import { BasePage } from "../BasePage";
 
 /**
  * ProductDetailsPage encapsulates interactions with a single
@@ -10,18 +10,18 @@ import { BasePage } from '../BasePage';
  * cart view.
  */
 export class ProductDetailsPage extends BasePage {
-
   constructor(page: Page) {
-    super(page)
+    super(page);
   }
 
   // Selectors
-  private readonly productLink = "a[href='/products']"
-  private readonly addToCartButton = (productName: string): string => `xpath=(.//p[text()="${productName}"]//following-sibling::a)[1]`
-  private readonly viewCartLink = "a:has-text('View Cart')"
+  private readonly productLink = "a[href='/products']";
+  private readonly addToCartButton = (productName: string): string =>
+    `xpath=(.//p[text()="${productName}"]//following-sibling::a)[1]`;
+  private readonly viewCartLink = "a:has-text('View Cart')";
 
   async goto(): Promise<void> {
-    await this.page.click(this.productLink)
+    await this.page.click(this.productLink);
   }
 
   /**
@@ -29,9 +29,9 @@ export class ProductDetailsPage extends BasePage {
    * page the button has classes `btn` and `cart`.
    */
   async addToCart(productName: string): Promise<void> {
-    await this.page.click(this.addToCartButton(productName))
-    
-    // Wait for the “Added!” message or modal; the site displays
+    await this.page.click(this.addToCartButton(productName));
+
+    // Wait for the “Added!” message or modal the site displays
     // a small toast with a View Cart link.  We wait for that
     // link to appear to ensure the item was added.
     await this.page.waitForSelector(this.viewCartLink);

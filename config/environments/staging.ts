@@ -1,4 +1,4 @@
-import { EnvironmentConfig } from '../../src/framework/ConfigManager';
+import { EnvironmentConfig } from "../../src/framework/core/ConfigManager";
 
 /**
  * Staging environment configuration.  Values are loaded primarily from
@@ -6,13 +6,13 @@ import { EnvironmentConfig } from '../../src/framework/ConfigManager';
  * reasonable defaults when not set.
  */
 const stagingConfig: EnvironmentConfig = {
-  baseUrl: process.env.STAGING_BASE_URL || 'https://staging.example.com',
-  apiUrl: process.env.STAGING_API_URL || 'https://api.staging.example.com',
-  provider: process.env.STAGING_PROVIDER || 'browserstack',
+  provider: process.env.STAGING_PROVIDER || "browserstack",
   user: process.env.STAGING_CLOUD_USER,
   key: process.env.STAGING_CLOUD_KEY,
-  automationExerciseBaseUrl: 'https://automationexercise.com',
-  exampleBaseUrl: 'https://www.example.com'
+  automationExerciseBaseUrl: "https://automationexercise.com",
+  exampleBaseUrl: "https://www.example.com",
+  reqResBaseUrl: "https://reqres.in",
+  reqResApiKey: process.env.REQ_RES_API_KEY,
 };
 
 export default stagingConfig;

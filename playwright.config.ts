@@ -1,56 +1,67 @@
-import { PlaywrightTestConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
-
-// Load environment variables from .env file if present.  This enables
-// environment‑agnostic configuration; the test environment is selected via
-// TEST_ENVIRONMENT and ConfigManager within the framework.
+import { defineConfig, devices } from "@playwright/test";
+import dotenv from "dotenv";
+import path from "path";
 dotenv.config();
 
-const config: PlaywrightTestConfig = {
-  testDir: 'tests/ui/specs',
+const ALLURE_DIR = path.resolve(__dirname, "reports/allure/allure-results");
+
+export default defineConfig({
+  testDir: "tests",
   timeout: 60_000,
   retries: process.env.CI ? 2 : 0,
-  reporter: [['html', { outputFolder: 'reports/html/playwright' }], ['list']],
+  reporter: [
+    ["html", { outputFolder: "reports/html/playwright" }],
+    ["list"],
+    ["allure-playwright", { resultsDir: ALLURE_DIR }],
+  ],
   use: {
-    headless: false,
+    headless: process.env.HEADLESS === "true",
     viewport: { width: 1280, height: 720 },
-    // Accept self‑signed certificates on non‑prod environments
-    ignoreHTTPSErrors: true
+    ignoreHTTPSErrors: true,
   },
   projects: [
+    // -------- API (runs once, no browsers involved) --------
     {
-      name: 'ui unit',
-      grep: /@unit-ui/,
-      use: { ...devices },
-      testMatch: '**/tests/ui/specs/sample.spec.ts'
+      name: "api unit",
+      testMatch: ["api/specs/**/*.spec.ts"], // only API files
+      grep: /@unit-api/,
     },
-    {
-      name: 'ui unit',
-      grep: /@unit-ui/,
-      use: { ...devices['Desktop Firefox'] },
-      testMatch: '**/tests/ui/specs/sample.spec.ts'
-    },
-    {
-      name: 'ui unit',
-      grep: /@unit-ui/,
-      use: { ...devices['Desktop Safari'] },
-      testMatch: '**/tests/ui/specs/sample.spec.ts'
-    },
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] }
-    },
-    {
-      name: 'firefox',
-      use: { ...devices['Desktop Firefox'] }
-    },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] }
-    }
-  ],
-  // Global setup could be used to perform login or load environment config
-  // globalSetup: require.resolve('./tests/ui/globalSetup'),
-};
 
-export default config;
+    // -------- UI (only UI files) --------
+    {
+      name: "ui unit chromium",
+      testMatch: ["ui/specs/**/*.spec.ts"], // only UI files
+      grep: /@unit-ui/,
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "ui unit firefox",
+      testMatch: ["ui/specs/**/*.spec.ts"],
+      grep: /@unit-ui/,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "ui unit webkit",
+      testMatch: ["ui/specs/**/*.spec.ts"],
+      grep: /@unit-ui/,
+      use: { ...devices["Desktop Safari"] },
+    },
+
+    // If you keep these generic browser projects, scope them to UI too:
+    {
+      name: "chromium",
+      testMatch: ["ui/specs/**/*.spec.ts"],
+      use: { ...devices["Desktop Chrome"] },
+    },
+    {
+      name: "firefox",
+      testMatch: ["ui/specs/**/*.spec.ts"],
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "webkit",
+      testMatch: ["ui/specs/**/*.spec.ts"],
+      use: { ...devices["Desktop Safari"] },
+    },
+  ],
+});

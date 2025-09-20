@@ -6,6 +6,6 @@
 export default {
   user: process.env.BROWSERSTACK_USER,
   key: process.env.BROWSERSTACK_KEY,
-  local: process.env.BROWSERSTACK_LOCAL === 'true',
-  region: process.env.BROWSERSTACK_REGION || 'us'
+  local: process.env.BROWSERSTACK_LOCAL === "true",
+  region: process.env.BROWSERSTACK_REGION || "us",
 };
