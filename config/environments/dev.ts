@@ -1,4 +1,4 @@
-import { EnvironmentConfig } from '../../src/framework/ConfigManager';
+import { EnvironmentConfig } from "../../src/framework/core/ConfigManager"
 
 /**
  * Development environment configuration.  Defines base URLs and provider
@@ -6,13 +6,13 @@ import { EnvironmentConfig } from '../../src/framework/ConfigManager';
  * supplied via environment variables and are optional in dev.
  */
 const devConfig: EnvironmentConfig = {
-  baseUrl: 'http://localhost:3000',
-  apiUrl: 'http://localhost:3001',
-  provider: 'local',
+  provider: "local",
   user: process.env.CLOUD_USER,
   key: process.env.CLOUD_KEY,
-  automationExerciseBaseUrl: 'https://automationexercise.com',
-  exampleBaseUrl: 'https://www.example.com'
-};
+  automationExerciseBaseUrl: "https://automationexercise.com",
+  exampleBaseUrl: "https://www.example.com",
+  reqResBaseUrl: "https://reqres.in",
+  reqResApiKey: process.env.REQ_RES_API_KEY
+}
 
-export default devConfig;
+export default devConfig
