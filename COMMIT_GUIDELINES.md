@@ -23,42 +23,50 @@ Follow the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/
 - **footer**: references issues (e.g., `Closes #123`), breaking changes, or DCO sign-off
 
 ### Examples
+
 - `feat(api): add OAuth2 client credentials flow`
 - `fix(playwright): resolve config loading for headers`
 - `docs: clarify PR process`
 - `refactor: extract device broker logic`
 
 ## 2. Write Clear, Descriptive Messages
+
 - Summarize the change in the first line (max 72 chars)
 - Separate summary from body with a blank line
 - Use the body to explain the motivation, context, or consequences
 - Reference related issues/PRs in the footer
 
 ## 3. Sign Your Commits (DCO)
+
 - All commits must be signed off to certify you have the right to submit the work ([Developer Certificate of Origin](https://developercertificate.org/))
 - Add a sign-off line at the end of your commit message:
   - `Signed-off-by: Your Name <your@email.com>`
 - Use `git commit -s` to add this automatically
 
 ## 4. One Logical Change Per Commit
+
 - Each commit should do one thing: fix a bug, add a feature, refactor, etc.
 - Avoid mixing unrelated changes in a single commit
 - Large changes: split into smaller, self-contained commits
 
 ## 5. No WIP/Temporary Commits in Main Branch
+
 - Squash or rebase to remove work-in-progress, "fix typo", or "update" commits before merging
 - Use meaningful commit messages for all history in main branches
 
 ## 6. Breaking Changes
+
 - If a commit introduces a breaking change, include a `BREAKING CHANGE:` footer with details and migration steps
 - Example:
   - `BREAKING CHANGE: removes deprecated device broker API`
 
 ## 7. Linting and CI
+
 - Commit messages are checked by CI for Conventional Commit compliance
 - PRs with invalid commit messages may be rejected
 
 ## 8. Example Commit Message
+
 ```
 feat(api): add OAuth2 client credentials flow
 
@@ -70,6 +78,7 @@ Signed-off-by: Jane Doe <jane@example.com>
 ```
 
 ## 9. Resources
+
 - [Conventional Commits](https://www.conventionalcommits.org/)
 - [DCO](https://developercertificate.org/)
 - [How to Write a Git Commit Message](https://cbea.ms/git-commit/)

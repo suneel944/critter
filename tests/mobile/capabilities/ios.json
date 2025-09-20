@@ -1,7 +1,0 @@
-{
-  "platformName": "iOS",
-  "automationName": "XCUITest",
-  "deviceName": "iPhone Simulator",
-  "platformVersion": "16.0",
-  "app": "path/to/your/app.app"
-}

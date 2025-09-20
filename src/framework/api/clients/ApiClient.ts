@@ -1,16 +1,16 @@
-import { request, type APIRequestContext, type APIResponse } from "playwright"
+import { request, type APIRequestContext, type APIResponse } from "playwright";
 
 /**
  * Options supported by Playwright's verb-based methods (e.g. `ctx.get`).
  * @internal
  */
-type PWVerbOptions = NonNullable<Parameters<APIRequestContext["get"]>[1]>
+type PWVerbOptions = NonNullable<Parameters<APIRequestContext["get"]>[1]>;
 
 /**
  * Options supported by Playwright's `fetch` method.
  * @internal
  */
-type PWFetchOptions = NonNullable<Parameters<APIRequestContext["fetch"]>[1]>
+type PWFetchOptions = NonNullable<Parameters<APIRequestContext["fetch"]>[1]>;
 
 /**
  * Extended options for verb-based methods.
@@ -21,7 +21,7 @@ type PWFetchOptions = NonNullable<Parameters<APIRequestContext["fetch"]>[1]>
  * will create a new context lazily and keep it alive until {@link ApiClient.dispose}
  * is called (see ownership rules below).
  */
-type RequestOptions = PWVerbOptions & { context?: APIRequestContext }
+type RequestOptions = PWVerbOptions & { context?: APIRequestContext };
 
 /**
  * Extended options for `options()` requests (implemented via `fetch`).
@@ -29,7 +29,7 @@ type RequestOptions = PWVerbOptions & { context?: APIRequestContext }
  * @remarks
  * Same ownership semantics as {@link RequestOptions}.
  */
-type OptionsRequestOptions = PWFetchOptions & { context?: APIRequestContext }
+type OptionsRequestOptions = PWFetchOptions & { context?: APIRequestContext };
 
 /**
  * Lightweight API client over Playwright's {@link APIRequestContext}.
@@ -81,9 +81,9 @@ type OptionsRequestOptions = PWFetchOptions & { context?: APIRequestContext }
  */
 export default class ApiClient {
   /** Base URL used when creating client-owned contexts. */
-  private readonly baseURL: string
+  private readonly baseURL: string;
   /** Default headers applied when creating client-owned contexts. */
-  private readonly defaultHeaders: Record<string, string>
+  private readonly defaultHeaders: Record<string, string>;
   /**
    * Contexts created by this client (owned by the client).
    *
@@ -91,7 +91,7 @@ export default class ApiClient {
    * Only contexts created internally are tracked. Contexts provided by the
    * caller via `options.context` are *not* tracked and will not be disposed here.
    */
-  private readonly _ownedContexts = new Set<APIRequestContext>()
+  private readonly _ownedContexts = new Set<APIRequestContext>();
 
   /**
    * Construct a new `ApiClient`.
@@ -99,9 +99,12 @@ export default class ApiClient {
    * @param init.baseURL - Base URL used for client-owned contexts.
    * @param init.defaultHeaders - Default HTTP headers for client-owned contexts.
    */
-  constructor(init: { baseURL: string, defaultHeaders: Record<string, string> }) {
-    this.baseURL = init.baseURL
-    this.defaultHeaders = init.defaultHeaders
+  constructor(init: {
+    baseURL: string;
+    defaultHeaders: Record<string, string>;
+  }) {
+    this.baseURL = init.baseURL;
+    this.defaultHeaders = init.defaultHeaders;
   }
 
   /**
@@ -125,15 +128,15 @@ export default class ApiClient {
     ctx: APIRequestContext | undefined,
     fn: (c: APIRequestContext) => Promise<T>,
   ): Promise<T> {
-    let context = ctx
+    let context = ctx;
     if (!context) {
       context = await request.newContext({
         baseURL: this.baseURL,
         extraHTTPHeaders: this.defaultHeaders,
-      })
-      this._ownedContexts.add(context)
+      });
+      this._ownedContexts.add(context);
     }
-    return await fn(context)
+    return await fn(context);
   }
 
   /**
@@ -146,17 +149,17 @@ export default class ApiClient {
    * (passed via `options.context`) are never disposed here.
    */
   public async dispose(): Promise<void> {
-    const errors: unknown[] = []
+    const errors: unknown[] = [];
     for (const ctx of this._ownedContexts) {
       try {
-        await ctx.dispose()
+        await ctx.dispose();
       } catch (e) {
-        errors.push(e)
+        errors.push(e);
       }
     }
-    this._ownedContexts.clear()
+    this._ownedContexts.clear();
     if (errors.length) {
-      throw new AggregateError(errors, "ApiClient.dispose() failed!")
+      throw new AggregateError(errors, "ApiClient.dispose() failed!");
     }
   }
 
@@ -169,9 +172,12 @@ export default class ApiClient {
    * @param options - Playwright request options plus optional `context`.
    * @returns The Playwright {@link APIResponse}.
    */
-  public async get(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.get(path, opts))
+  public async get(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.get(path, opts));
   }
 
   /**
@@ -180,27 +186,39 @@ export default class ApiClient {
    * @param path - Request path.
    * @param options - Playwright request options plus optional `context`.
    */
-  public async post(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.post(path, opts))
+  public async post(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.post(path, opts));
   }
 
   /** Perform an HTTP **PUT** request. */
-  public async put(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.put(path, opts))
+  public async put(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.put(path, opts));
   }
 
   /** Perform an HTTP **DELETE** request. */
-  public async delete(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.delete(path, opts))
+  public async delete(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.delete(path, opts));
   }
 
   /** Perform an HTTP **PATCH** request. */
-  public async patch(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.patch(path, opts))
+  public async patch(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.patch(path, opts));
   }
 
   /**
@@ -210,9 +228,12 @@ export default class ApiClient {
    * HEAD must not have a body. Playwright ignores body fields for HEAD; other
    * options (headers, params, timeout, etc.) are forwarded.
    */
-  public async head(path: string, options: RequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.head(path, opts))
+  public async head(
+    path: string,
+    options: RequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) => ctx.head(path, opts));
   }
 
   /**
@@ -222,8 +243,13 @@ export default class ApiClient {
    * Implemented via `ctx.fetch(path, { ...opts, method: "OPTIONS" })`.
    * Useful for CORS preflight checks or capability discovery.
    */
-  public async options(path: string, options: OptionsRequestOptions = {}): Promise<APIResponse> {
-    const { context, ...opts } = options
-    return this.withContext(context, (ctx) => ctx.fetch(path, { ...opts, method: "OPTIONS" }))
+  public async options(
+    path: string,
+    options: OptionsRequestOptions = {},
+  ): Promise<APIResponse> {
+    const { context, ...opts } = options;
+    return this.withContext(context, (ctx) =>
+      ctx.fetch(path, { ...opts, method: "OPTIONS" }),
+    );
   }
 }
