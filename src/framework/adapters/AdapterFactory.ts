@@ -1,6 +1,6 @@
-import type { IAdapter } from "./IAdapter"
-import { PlaywrightAdapter } from "./PlaywrightAdapter"
-import { AppiumAdapter } from "./AppiumAdapter"
+import type { IAdapter } from "./IAdapter";
+import { PlaywrightAdapter } from "./PlaywrightAdapter";
+import { AppiumAdapter } from "./AppiumAdapter";
 
 /**
  * @packageDocumentation
@@ -37,7 +37,7 @@ import { AppiumAdapter } from "./AppiumAdapter"
  *
  * @public
  */
-export type AdapterKind = "playwright" | "appium"
+export type AdapterKind = "playwright" | "appium";
 
 /**
  * Registry mapping each {@link AdapterKind} to its concrete adapter class.
@@ -55,7 +55,7 @@ export type AdapterKind = "playwright" | "appium"
 const registry: Record<AdapterKind, new () => IAdapter> = {
   playwright: PlaywrightAdapter,
   appium: AppiumAdapter,
-}
+};
 
 /**
  * Factory for instantiating adapters by kind.
@@ -84,7 +84,7 @@ export default class AdapterFactory {
    * but forget to register it, TypeScript will produce a compile-time error.
    */
   static create(kind: AdapterKind): IAdapter {
-    const Ctor = registry[kind]
-    return new Ctor()
+    const Ctor = registry[kind];
+    return new Ctor();
   }
 }

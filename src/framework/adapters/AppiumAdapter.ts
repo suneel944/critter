@@ -3,7 +3,6 @@ import type { Browser } from "webdriverio";
 import { IAdapter } from "./IAdapter";
 import { WebdriverIOConfig } from "@wdio/types/build/Capabilities";
 
-
 /**
  * Adapter that drives **Appium** sessions via **WebdriverIO** (standalone mode).
  *

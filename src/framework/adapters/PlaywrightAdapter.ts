@@ -1,14 +1,14 @@
-import { chromium, firefox, webkit } from "playwright"
+import { chromium, firefox, webkit } from "playwright";
 import type {
   Browser,
   BrowserContext,
   BrowserContextOptions,
   LaunchOptions,
   Page,
-} from "playwright"
-import { IAdapter } from "./IAdapter"
+} from "playwright";
+import { IAdapter } from "./IAdapter";
 
-type PWBrowser = "chromium" | "firefox" | "webkit"
+type PWBrowser = "chromium" | "firefox" | "webkit";
 
 /**
  * Adapter for running local Playwright sessions.
@@ -20,9 +20,9 @@ type PWBrowser = "chromium" | "firefox" | "webkit"
  * - Can bind to an existing browser, context, or page session provided by a broker.
  */
 export class PlaywrightAdapter implements IAdapter {
-  private browser!: Browser
-  private context!: BrowserContext
-  private page!: Page
+  private browser!: Browser;
+  private context!: BrowserContext;
+  private page!: Page;
 
   /**
    * Start a new Playwright session.
@@ -38,17 +38,17 @@ export class PlaywrightAdapter implements IAdapter {
    * - Opens a fresh {@link Page}.
    */
   async init(options?: {
-    browser?: PWBrowser
-    launchOptions?: LaunchOptions
-    contextOptions?: BrowserContextOptions
+    browser?: PWBrowser;
+    launchOptions?: LaunchOptions;
+    contextOptions?: BrowserContextOptions;
   }): Promise<void> {
-    const kind = options?.browser ?? "chromium"
-    const engines = { chromium, firefox, webkit } as const
-    const engine = engines[kind]
+    const kind = options?.browser ?? "chromium";
+    const engines = { chromium, firefox, webkit } as const;
+    const engine = engines[kind];
 
-    this.browser = await engine.launch(options?.launchOptions)
-    this.context = await this.browser.newContext(options?.contextOptions)
-    this.page = await this.context.newPage()
+    this.browser = await engine.launch(options?.launchOptions);
+    this.context = await this.browser.newContext(options?.contextOptions);
+    this.page = await this.context.newPage();
   }
 
   /**
@@ -61,31 +61,38 @@ export class PlaywrightAdapter implements IAdapter {
    *
    * @throws If provided handles are invalid (e.g. context has no browser).
    */
-  async bind(session: { page?: Page; context?: BrowserContext; browser?: Browser }): Promise<void> {
+  async bind(session: {
+    page?: Page;
+    context?: BrowserContext;
+    browser?: Browser;
+  }): Promise<void> {
     if (session.page) {
-      this.page = session.page
-      const ctx = this.page.context()
-      const br = ctx.browser()
-      if (!br) throw new Error("PlaywrightAdapter.bind: page has no browser")
-      this.context = ctx
-      this.browser = br
-      return
+      this.page = session.page;
+      const ctx = this.page.context();
+      const br = ctx.browser();
+      if (!br) throw new Error("PlaywrightAdapter.bind: page has no browser");
+      this.context = ctx;
+      this.browser = br;
+      return;
     }
     if (session.context) {
-      this.context = session.context
-      const br = this.context.browser()
-      if (!br) throw new Error("PlaywrightAdapter.bind: context has no browser")
-      this.browser = br
-      this.page = await this.context.newPage()
-      return
+      this.context = session.context;
+      const br = this.context.browser();
+      if (!br)
+        throw new Error("PlaywrightAdapter.bind: context has no browser");
+      this.browser = br;
+      this.page = await this.context.newPage();
+      return;
     }
     if (session.browser) {
-      this.browser = session.browser
-      this.context = await this.browser.newContext()
-      this.page = await this.context.newPage()
-      return
+      this.browser = session.browser;
+      this.context = await this.browser.newContext();
+      this.page = await this.context.newPage();
+      return;
     }
-    throw new Error("PlaywrightAdapter.bind requires { page } or { context } or { browser }")
+    throw new Error(
+      "PlaywrightAdapter.bind requires { page } or { context } or { browser }",
+    );
   }
 
   /**
@@ -96,8 +103,8 @@ export class PlaywrightAdapter implements IAdapter {
    * Waits for the DOM content to be fully loaded.
    */
   async navigate(url: string): Promise<void> {
-    this.ensureReady()
-    await this.page.goto(url, { waitUntil: "domcontentloaded" })
+    this.ensureReady();
+    await this.page.goto(url, { waitUntil: "domcontentloaded" });
   }
 
   /**
@@ -120,60 +127,74 @@ export class PlaywrightAdapter implements IAdapter {
    * @throws If the action keyword is unsupported or parameters are invalid.
    */
   async execute(action: string, params?: unknown): Promise<unknown> {
-    this.ensureReady()
+    this.ensureReady();
 
     switch (action) {
       case "click": {
-        const { selector } = as<{ selector: string }>(params)
-        await this.page.locator(selector).click()
-        return
+        const { selector } = as<{ selector: string }>(params);
+        await this.page.locator(selector).click();
+        return;
       }
 
       case "fill": {
-        const { selector, value } = as<{ selector: string; value: string }>(params)
-        await this.page.locator(selector).fill(value)
-        return
+        const { selector, value } = as<{ selector: string; value: string }>(
+          params,
+        );
+        await this.page.locator(selector).fill(value);
+        return;
       }
 
       case "type": {
-        const { selector, text, delayMs } =
-          as<{ selector: string; text: string; delayMs?: number }>(params)
-        const loc = this.page.locator(selector)
+        const { selector, text, delayMs } = as<{
+          selector: string;
+          text: string;
+          delayMs?: number;
+        }>(params);
+        const loc = this.page.locator(selector);
 
         if (delayMs && delayMs > 0) {
-          await loc.pressSequentially(text, { delay: delayMs })
+          await loc.pressSequentially(text, { delay: delayMs });
         } else {
-          await loc.fill(text)
+          await loc.fill(text);
         }
-        return
+        return;
       }
 
       case "getText": {
-        const { selector } = as<{ selector: string }>(params)
-        const text = await this.page.locator(selector).textContent()
-        return text ?? ""
+        const { selector } = as<{ selector: string }>(params);
+        const text = await this.page.locator(selector).textContent();
+        return text ?? "";
       }
 
       case "waitForSelector": {
-        const { selector, state, timeoutMs } =
-          as<{ selector: string; state?: "attached" | "detached" | "visible" | "hidden"; timeoutMs?: number }>(params)
-        await this.page.locator(selector).waitFor({ state: state ?? "visible", timeout: timeoutMs })
-        return true
+        const { selector, state, timeoutMs } = as<{
+          selector: string;
+          state?: "attached" | "detached" | "visible" | "hidden";
+          timeoutMs?: number;
+        }>(params);
+        await this.page
+          .locator(selector)
+          .waitFor({ state: state ?? "visible", timeout: timeoutMs });
+        return true;
       }
 
       case "screenshot": {
-        const { path, fullPage } = as<{ path?: string; fullPage?: boolean }>(params ?? {})
-        return this.page.screenshot({ path, fullPage: !!fullPage })
+        const { path, fullPage } = as<{ path?: string; fullPage?: boolean }>(
+          params ?? {},
+        );
+        return this.page.screenshot({ path, fullPage: !!fullPage });
       }
 
       case "title":
-        return this.page.title()
+        return this.page.title();
 
       case "url":
-        return this.page.url()
+        return this.page.url();
 
       default:
-        throw new Error(`PlaywrightAdapter.execute: unsupported action "${action}"`)
+        throw new Error(
+          `PlaywrightAdapter.execute: unsupported action "${action}"`,
+        );
     }
   }
 
@@ -185,9 +206,15 @@ export class PlaywrightAdapter implements IAdapter {
    * Safe to call multiple times; ignores errors if already closed.
    */
   async teardown(): Promise<void> {
-    try { await this.page?.close() } catch {}
-    try { await this.context?.close() } catch {}
-    try { await this.browser?.close() } catch {}
+    try {
+      await this.page?.close();
+    } catch {}
+    try {
+      await this.context?.close();
+    } catch {}
+    try {
+      await this.browser?.close();
+    } catch {}
   }
 
   /**
@@ -197,7 +224,9 @@ export class PlaywrightAdapter implements IAdapter {
    */
   private ensureReady(): void {
     if (!this.page || !this.context || !this.browser) {
-      throw new Error("PlaywrightAdapter: not started. Call init() or bind() first.")
+      throw new Error(
+        "PlaywrightAdapter: not started. Call init() or bind() first.",
+      );
     }
   }
 
@@ -207,8 +236,8 @@ export class PlaywrightAdapter implements IAdapter {
    * @returns The current page instance.
    */
   public getPage(): Page {
-    this.ensureReady()
-    return this.page
+    this.ensureReady();
+    return this.page;
   }
 }
 
@@ -221,6 +250,6 @@ export class PlaywrightAdapter implements IAdapter {
  * @throws If `v` is not a plain object.
  */
 function as<T extends object>(v: unknown): T {
-  if (!v || typeof v !== "object") throw new Error("Invalid parameters")
-  return v as T
+  if (!v || typeof v !== "object") throw new Error("Invalid parameters");
+  return v as T;
 }
