@@ -9,25 +9,25 @@ export default class DataGenerator {
    */
   public static randomString(length: number = 8): string {
     const chars =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    let result = ""
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
     for (let i = 0; i < length; i++) {
-      result += chars.charAt(Math.floor(Math.random() * chars.length))
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
     }
-    return result
+    return result;
   }
 
   /**
    * Generates a random integer between min (inclusive) and max (inclusive).
    */
   public static randomInt(min: number, max: number): number {
-    return Math.floor(Math.random() * (max - min + 1)) + min
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
   /**
    * Returns a random boolean value.
    */
   public static randomBool(): boolean {
-    return Math.random() < 0.5
+    return Math.random() < 0.5;
   }
 }
