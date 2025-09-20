@@ -1,4 +1,4 @@
-# Critter – Unified Automation Framework
+# [WIP] Critter – Unified Automation Framework
 
 <p align="center"><img width="520" height="520" alt="critter" src="https://github.com/user-attachments/assets/f6e59ef4-bd88-4b77-92e3-0ddad055c1e8" /></p>
 
