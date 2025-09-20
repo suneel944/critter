@@ -1,11 +1,11 @@
-export { default as ConfigManager } from "./core/ConfigManager";
-export { default as ProviderFactory } from "./core/ProviderFactory";
-export { default as DeviceBroker } from "./core/DeviceBroker";
-export { LocalProvider } from "./providers/LocalProvider";
-export { BrowserStackProvider } from "./providers/BrowserStackProvider";
-export { SauceLabsProvider } from "./providers/SauceLabsProvider";
-export { default as ApiClient } from "./api/clients/ApiClient";
-export { default as ResponseValidator } from "./api/ResponseValidator";
-export { default as Logger } from "./shared/logger";
-export { default as DataGenerator } from "./shared/dataGenerator";
-export { CapabilityBuilder } from "./capabilities/CapabilityBuilder";
+export { default as ConfigManager } from "./core/ConfigManager"
+export { default as ProviderFactory } from "./core/ProviderFactory"
+export { default as DeviceBroker } from "./core/DeviceBroker"
+export { LocalProvider } from "./providers/LocalProvider"
+export { BrowserStackProvider } from "./providers/BrowserStackProvider"
+export { SauceLabsProvider } from "./providers/SauceLabsProvider"
+export { default as ApiClient } from "./api/clients/ApiClient"
+export { default as ResponseValidator } from "./api/ResponseValidator"
+export { default as Logger } from "./shared/logger"
+export { default as DataGenerator } from "./shared/dataGenerator"
+export { CapabilityBuilder } from "./capabilities/CapabilityBuilder"

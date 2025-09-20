@@ -57,14 +57,14 @@ export interface IAdapter<
    * @remarks
    * Optional in provider-driven flows (e.g. when sessions come from BrowserStack/Sauce).
    */
-  init(options?: TInit): Promise<void>;
+  init(options?: TInit): Promise<void>
 
   /**
    * Attach/bind to an existing session created by a provider.
    *
    * @param session - Existing session handle (e.g. Page, BrowserContext, WebDriver driver).
    */
-  bind(session: TBind): Promise<void>;
+  bind(session: TBind): Promise<void>
 
   /**
    * Navigate/open context.
@@ -74,7 +74,7 @@ export interface IAdapter<
    * @remarks
    * For native apps, this may be a no-op unless navigating to a webview or deep link.
    */
-  navigate(target: string, params?: TNavigate): Promise<void>;
+  navigate(target: string, params?: TNavigate): Promise<void>
 
   /**
    * Execute a tool-agnostic action.
@@ -95,7 +95,7 @@ export interface IAdapter<
   execute<A extends TActions>(
     action: A,
     params?: TParams[A],
-  ): Promise<TResults[A]>;
+  ): Promise<TResults[A]>
 
   /**
    * Graceful cleanup.
@@ -103,5 +103,5 @@ export interface IAdapter<
    * @remarks
    * Should close/release any sessions, contexts, or drivers and must not throw if already closed.
    */
-  teardown(): Promise<void>;
+  teardown(): Promise<void>
 }

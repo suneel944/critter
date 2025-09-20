@@ -7,4 +7,4 @@ export default {
   region: process.env.SAUCE_REGION || "us-west-1",
   connect: process.env.SAUCE_CONNECT === "true",
   tunnelIdentifier: process.env.SAUCE_TUNNEL_IDENTIFIER,
-};
+}
