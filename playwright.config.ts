@@ -1,9 +1,9 @@
-import { defineConfig, devices } from "@playwright/test";
-import dotenv from "dotenv";
-import path from "path";
-dotenv.config();
+import { defineConfig, devices } from "@playwright/test"
+import dotenv from "dotenv"
+import path from "path"
+dotenv.config()
 
-const ALLURE_DIR = path.resolve(__dirname, "reports/allure/allure-results");
+const ALLURE_DIR = path.resolve(__dirname, "reports/allure/allure-results")
 
 export default defineConfig({
   testDir: "tests",
@@ -64,4 +64,4 @@ export default defineConfig({
       use: { ...devices["Desktop Safari"] },
     },
   ],
-});
+})

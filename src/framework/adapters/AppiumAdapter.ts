@@ -1,7 +1,7 @@
-import { remote } from "webdriverio";
-import type { Browser } from "webdriverio";
-import { IAdapter } from "./IAdapter";
-import { WebdriverIOConfig } from "@wdio/types/build/Capabilities";
+import { remote } from "webdriverio"
+import type { Browser } from "webdriverio"
+import { IAdapter } from "./IAdapter"
+import { WebdriverIOConfig } from "@wdio/types/build/Capabilities"
 
 /**
  * Adapter that drives **Appium** sessions via **WebdriverIO** (standalone mode).
@@ -38,7 +38,7 @@ export class AppiumAdapter implements IAdapter {
    * Underlying WebdriverIO browser/session instance.
    * Set by {@link init} or {@link bind}.
    */
-  private driver?: Browser;
+  private driver?: Browser
 
   /**
    * Create a new WebdriverIO session using the provided options.
@@ -65,9 +65,9 @@ export class AppiumAdapter implements IAdapter {
    */
   async init(options: WebdriverIOConfig): Promise<void> {
     if (!options?.capabilities) {
-      throw new Error("AppiumAdapter.init requires options.capabilities");
+      throw new Error("AppiumAdapter.init requires options.capabilities")
     }
-    this.driver = await remote(options);
+    this.driver = await remote(options)
   }
 
   /**
@@ -89,8 +89,8 @@ export class AppiumAdapter implements IAdapter {
    */
   async bind(session: { driver?: Browser }): Promise<void> {
     if (!session?.driver)
-      throw new Error("AppiumAdapter.bind requires { driver }");
-    this.driver = session.driver;
+      throw new Error("AppiumAdapter.bind requires { driver }")
+    this.driver = session.driver
   }
 
   /**
@@ -108,8 +108,8 @@ export class AppiumAdapter implements IAdapter {
    * ```
    */
   async navigate(target: string): Promise<void> {
-    this.ensureStarted();
-    await this.driver!.url(target);
+    this.ensureStarted()
+    await this.driver!.url(target)
   }
 
   /**
@@ -149,42 +149,40 @@ export class AppiumAdapter implements IAdapter {
     action: string,
     params?: { selector?: string; value?: string; appId?: string },
   ): Promise<unknown> {
-    this.ensureStarted();
+    this.ensureStarted()
 
     switch (action) {
       case "tap": {
-        if (!params?.selector) throw new Error("tap: selector required");
-        const el = this.driver!.$(params.selector);
-        return el.click();
+        if (!params?.selector) throw new Error("tap: selector required")
+        const el = this.driver!.$(params.selector)
+        return el.click()
       }
       case "setValue": {
         if (!params?.selector || params.value === undefined) {
-          throw new Error("setValue: selector & value required");
+          throw new Error("setValue: selector & value required")
         }
-        const el = this.driver!.$(params.selector);
-        return el.setValue(params.value);
+        const el = this.driver!.$(params.selector)
+        return el.setValue(params.value)
       }
       case "getText": {
-        if (!params?.selector) throw new Error("getText: selector required");
-        const el = this.driver!.$(params.selector);
-        return el.getText();
+        if (!params?.selector) throw new Error("getText: selector required")
+        const el = this.driver!.$(params.selector)
+        return el.getText()
       }
       case "launchApp": {
-        if (!params?.appId) throw new Error("launchApp: appId required");
+        if (!params?.appId) throw new Error("launchApp: appId required")
         return this.driver!.execute("mobile: launchApp", {
           appId: params.appId,
-        });
+        })
       }
       case "terminateApp": {
-        if (!params?.appId) throw new Error("terminateApp: appId required");
+        if (!params?.appId) throw new Error("terminateApp: appId required")
         return this.driver!.execute("mobile: terminateApp", {
           appId: params.appId,
-        });
+        })
       }
       default:
-        throw new Error(
-          `AppiumAdapter.execute: unsupported action "${action}"`,
-        );
+        throw new Error(`AppiumAdapter.execute: unsupported action "${action}"`)
     }
   }
 
@@ -202,8 +200,8 @@ export class AppiumAdapter implements IAdapter {
    */
   async teardown(): Promise<void> {
     if (this.driver) {
-      await this.driver.deleteSession().catch(() => void 0);
-      this.driver = undefined;
+      await this.driver.deleteSession().catch(() => void 0)
+      this.driver = undefined
     }
   }
 
@@ -217,7 +215,7 @@ export class AppiumAdapter implements IAdapter {
     if (!this.driver) {
       throw new Error(
         "AppiumAdapter: driver not started. Call init() or bind() first.",
-      );
+      )
     }
   }
 }

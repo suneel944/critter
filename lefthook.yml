@@ -6,17 +6,17 @@ pre-commit:
   parallel: true
   # Fail fast but keep UX snappy
   jobs:
+    # Format only changed common text files (fast) — run FIRST so ESLint doesn't fight formatting
+    - name: prettier write
+      tags: [format, quality]
+      glob: "*.{ts,tsx,js,json,md,yml,yaml}"
+      run: npx prettier --write {staged_files}
+
     # Lint only changed TS/JS files (fast)
     - name: eslint fix
       tags: [frontend, mobile, quality]
       glob: "*.{ts,tsx,js}"
       run: npx eslint --fix {staged_files}
-
-    # Format only changed common text files (fast)
-    - name: prettier write
-      tags: [format, quality]
-      glob: "*.{ts,tsx,js,json,md,yml,yaml}"
-      run: npx prettier --write {staged_files}
 
     # Single run typecheck (don’t expand per-file)
     - name: typescript typecheck
@@ -32,10 +32,6 @@ pre-commit:
         else
           echo "gitleaks not installed skipping"
         fi
-
-    # Optional: project-specific script hook (example)
-    # - script: "scripts/hello.js"
-    #   runner: node
 
 # ──────────────────────────────────────────────────────────────────────────────
 commit-msg:
@@ -62,8 +58,3 @@ pre-push:
         else
           npx playwright test --reporter=line --grep @smoke
         fi
-
-# ──────────────────────────────────────────────────────────────────────────────
-# Tips:
-# - Bypass hooks: LEFTHOOK=0 git commit -m "skip"
-# - For monorepos, replace commands with workspace-aware ones (see below).

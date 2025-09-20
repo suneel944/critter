@@ -8,4 +8,4 @@ export default {
   key: process.env.BROWSERSTACK_KEY,
   local: process.env.BROWSERSTACK_LOCAL === "true",
   region: process.env.BROWSERSTACK_REGION || "us",
-};
+}
