@@ -57,7 +57,7 @@ pre-push:
     - name: playwright smoke (optional)
       tags: [frontend, mobile, smoke]
       run: |
-        if [ "${CI}" = "true" ] || [ "${SKIP_SMOKE}" = "1" ] then
+        if [ "${CI}" = "true" ] || [ "${SKIP_SMOKE}" = "1" ]; then
           echo "Skipping Playwright smoke on CI or when SKIP_SMOKE=1"
         else
           npx playwright test --reporter=line --grep @smoke
