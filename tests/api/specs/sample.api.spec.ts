@@ -1,13 +1,13 @@
-import { test } from "../../fixtures/session"
-import { ConfigManager, ResponseValidator } from "../../../src/framework"
-import RequestBuilder from "../../../src/framework/api/builders/RequestBuilder"
+import { test } from "../../fixtures/session";
+import { ConfigManager, ResponseValidator } from "../../../src/framework";
+import RequestBuilder from "../../../src/framework/api/builders/RequestBuilder";
 
-let config: ConfigManager
+let config: ConfigManager;
 
 test.describe("ReqRes API Tests", () => {
   test.beforeAll(async () => {
-    config = ConfigManager.getInstance()
-  })
+    config = ConfigManager.getInstance();
+  });
 
   test(
     "Fetch a list of users with pagination",
@@ -19,17 +19,17 @@ test.describe("ReqRes API Tests", () => {
         defaultHeaders: {
           "x-api-key": config.get("reqResApiKey") as string,
         },
-      })
+      });
 
-      const getUserRequest = await RequestBuilder.get("/api/users").build()
+      const getUserRequest = await RequestBuilder.get("/api/users").build();
 
       // Act
-      const response = await session.apiSend(client, getUserRequest)
+      const response = await session.apiSend(client, getUserRequest);
 
       // Assert
-      await ResponseValidator.expectStatus(response, 200)
+      await ResponseValidator.expectStatus(response, 200);
     },
-  )
+  );
 
   test(
     "Fetch a single user by ID",
@@ -41,16 +41,16 @@ test.describe("ReqRes API Tests", () => {
         defaultHeaders: {
           "x-api-key": config.get("reqResApiKey") as string,
         },
-      })
+      });
 
       const getSpecificUserRequest =
-        await RequestBuilder.get("/api/users/1").build()
+        await RequestBuilder.get("/api/users/1").build();
 
       // Act
-      const response = await session.apiSend(client, getSpecificUserRequest)
+      const response = await session.apiSend(client, getSpecificUserRequest);
 
       // Assert
-      await ResponseValidator.expectStatus(response, 200)
+      await ResponseValidator.expectStatus(response, 200);
     },
-  )
-})
+  );
+});
