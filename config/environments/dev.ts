@@ -1,18 +1,19 @@
-import { EnvironmentConfig } from "../../src/framework/core/ConfigManager";
+import type { EnvironmentConfig } from '@critter'
 
 /**
- * Development environment configuration.  Defines base URLs and provider
- * defaults for local testing.  Credentials for cloud providers can be
- * supplied via environment variables and are optional in dev.
+ * Development environment configuration. Cloud creds are optional,
+ * so we coalesce to empty strings for strict typing.
  */
 const devConfig: EnvironmentConfig = {
-  provider: "local",
-  user: process.env.CLOUD_USER,
-  key: process.env.CLOUD_KEY,
-  automationExerciseBaseUrl: "https://automationexercise.com",
-  exampleBaseUrl: "https://www.example.com",
-  reqResBaseUrl: "https://reqres.in",
-  reqResApiKey: process.env.REQ_RES_API_KEY,
-};
+  provider: 'local',
+  user: process.env.CLOUD_USER ?? '',
+  key: process.env.CLOUD_KEY ?? '',
+  automationExerciseBaseUrl: 'https://automationexercise.com',
+  exampleBaseUrl: 'https://www.example.com',
+  reqResBaseUrl: 'https://reqres.in',
+  reqResApiKey: process.env.REQ_RES_API_KEY ?? '',
+  debug: process.env.DEBUG,
+  logLevel: process.env.LOG_LEVEL
+}
 
-export default devConfig;
+export default devConfig
