@@ -1,16 +1,10 @@
-import type { APIResponse } from "playwright";
+import ConfigManager from '../../config/ConfigManager'
+import type { APIResponse } from 'playwright'
 
 /**
  * Allowed HTTP methods for request builders and auth context.
  */
-export type HttpMethod =
-  | "GET"
-  | "POST"
-  | "PUT"
-  | "DELETE"
-  | "PATCH"
-  | "OPTIONS"
-  | "HEAD";
+export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'OPTIONS' | 'HEAD'
 
 /**
  * Context passed to authentication strategies when generating headers.
@@ -22,19 +16,19 @@ export type HttpMethod =
  */
 export interface AuthContext {
   /** Optional service identifier. */
-  service?: string;
+  service?: string
   /** The request path (relative to base URL). */
-  path: string;
+  path: string
   /** The HTTP method being executed. */
-  method: HttpMethod;
+  method: HttpMethod
   /** Optional tenant identifier. */
-  tenant?: string;
+  tenant?: string
   /** Optional OAuth scope string. */
-  scope?: string;
+  scope?: string
   /** Optional OAuth audience string. */
-  audience?: string;
+  audience?: string
   /** Arbitrary extra metadata. */
-  extras?: Record<string, string | number | boolean>;
+  extras?: Record<string, string | number | boolean>
 }
 
 /**
@@ -52,7 +46,7 @@ export interface AuthStrategy {
    * @param ctx - The request context including path, method, and optional metadata.
    * @returns A promise resolving to a record of header name/value pairs.
    */
-  headers(ctx: AuthContext): Promise<Record<string, string>>;
+  headers(ctx: AuthContext): Promise<Record<string, string>>
 
   /**
    * Optional hook invoked when an authentication error occurs.
@@ -62,7 +56,7 @@ export interface AuthStrategy {
    * @returns A promise that may resolve to void. If the strategy retries,
    *          implementations can throw or log as needed.
    */
-  onAuthError?(ctx: AuthContext, res: APIResponse): Promise<void>;
+  onAuthError?(ctx: AuthContext, res: APIResponse): Promise<void>
 }
 
 /**
@@ -77,7 +71,7 @@ export interface AuthStrategy {
  */
 export class NoAuth implements AuthStrategy {
   async headers(): Promise<Record<string, string>> {
-    return {};
+    return {}
   }
 }
 
@@ -99,9 +93,10 @@ export class ApiKeyAuth implements AuthStrategy {
   ) {}
 
   async headers() {
-    const v = process.env[this.valueEnv] || "";
-    if (!v) throw new Error(`Missing API key env: ${this.valueEnv}`);
-    return { [this.header]: v };
+    const cfg =  ConfigManager.getInstance()
+    const v = String(cfg.get(this.valueEnv))
+    if (!v) throw new Error(`Missing API key env: ${this.valueEnv}`)
+    return { [this.header]: v }
   }
 }
 
@@ -128,36 +123,42 @@ export class BasicAuth implements AuthStrategy {
   ) {}
 
   async headers() {
-    const u = process.env[this.userEnv] || "";
-    const p = process.env[this.passEnv] || "";
-    if (!u || !p) {
-      throw new Error(
-        `Missing basic creds envs: ${this.userEnv} and ${this.passEnv}`,
-      );
+    const cfg = ConfigManager.getInstance()
+    const u = cfg.get(this.userEnv)
+    const p = cfg.get(this.passEnv)
+    if (typeof u !== 'string' || typeof p !== 'string' || u.trim() === '' || p.trim() === '') {
+      throw new Error(`Missing basic creds envs: ${this.userEnv} and/or ${this.passEnv}`)
     }
     return {
-      Authorization: `Basic ${Buffer.from(`${u}:${p}`).toString("base64")}`,
-    };
+      Authorization: `Basic ${Buffer.from(`${u}:${p}`).toString('base64')}`,
+    }
   }
 }
 
 /**
- * Strategy that applies a Bearer token from an environment variable.
+ * Bearer token authentication strategy.
+ *
+ * This strategy never reads from environment variables and does not cache tokens.
+ * A valid token MUST be supplied at call time via `ctx.extras.token`.
  *
  * @example
  * ```ts
- * process.env.TOKEN = "abcdef"
- * const auth = new BearerAuth("TOKEN")
- * const headers = await auth.headers({ path: "/me", method: "GET" })
- * // => { Authorization: "Bearer abcdef" }
+ * const token = await loginAndGetToken();
+ * const auth = new BearerAuth();
+ * const headers = await auth.headers({
+ *   path: '/me',
+ *   method: 'GET',
+ *   extras: { token },
+ * });
+ * // => { Authorization: `Bearer ${token}` }
  * ```
  */
 export class BearerAuth implements AuthStrategy {
-  constructor(private token: string) {}
 
-  async headers() {
-    const t = process.env[this.token] || "";
-    if (!t) throw new Error(`Missing bearer token env: ${this.token}`);
-    return { Authorization: `Bearer ${t}` };
+  async headers(ctx: AuthContext) {
+    const raw = ctx.extras?.token
+    const token = typeof raw === 'string' ? raw.trim() : ''
+    if (!token) throw new Error('BearerAuth: token is required; ctx.extras.token')
+    return { Authorization: `Bearer ${token}` }
   }
 }
