@@ -1,5 +1,6 @@
-import { Page } from "@playwright/test";
-import { BasePage } from "../BasePage";
+import { BasePage } from '../BasePage'
+import type { Page } from '@playwright/test'
+
 
 /**
  * CartPage models the shopping cart view.  It exposes
@@ -10,11 +11,11 @@ import { BasePage } from "../BasePage";
  */
 export class CartPage extends BasePage {
   constructor(page: Page) {
-    super(page);
+    super(page)
   }
 
   // Selectors
-  private readonly checkOutButton = ".check_out";
+  private readonly checkOutButton = '.check_out'
 
   /**
    * Verify that the cart contains a product by its name.  Returns
@@ -22,9 +23,9 @@ export class CartPage extends BasePage {
    * provided text.  You can use this assertion in your tests.
    */
   async hasProduct(productName: string): Promise<boolean> {
-    const rows = this.page.locator("tr");
-    const count = await rows.filter({ hasText: productName }).count();
-    return count > 0;
+    const rows = this.page.locator('tr')
+    const count = await rows.filter({ hasText: productName }).count()
+    return count > 0
   }
 
   /**
@@ -34,6 +35,6 @@ export class CartPage extends BasePage {
    * to login.  Tests should handle the resulting page accordingly.
    */
   async proceedToCheckout(): Promise<void> {
-    await this.page.click(this.checkOutButton);
+    await this.page.click(this.checkOutButton)
   }
 }
