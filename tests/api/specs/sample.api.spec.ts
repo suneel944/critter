@@ -1,56 +1,48 @@
-import { test } from "../../fixtures/session";
-import { ConfigManager, ResponseValidator } from "../../../src/framework";
-import RequestBuilder from "../../../src/framework/api/builders/RequestBuilder";
+import { ConfigManager, ResponseValidator } from '@critter'
+import { RequestBuilder } from '@critter'
 
-let config: ConfigManager;
+import { test } from '../../fixtures/session'
 
-test.describe("ReqRes API Tests", () => {
-  test.beforeAll(async () => {
-    config = ConfigManager.getInstance();
-  });
+let config: ConfigManager
 
-  test(
-    "Fetch a list of users with pagination",
-    { tag: "@unit-api" },
-    async ({ session }) => {
-      // Arrange
-      const client = session.api({
-        baseURL: config.get("reqResBaseUrl") as string,
-        defaultHeaders: {
-          "x-api-key": config.get("reqResApiKey") as string,
-        },
-      });
+test.describe('ReqRes API Tests', () => {
+  test.beforeAll(() => {
+    config = ConfigManager.getInstance()
+  })
 
-      const getUserRequest = await RequestBuilder.get("/api/users").build();
+  test('Fetch a list of users with pagination', { tag: '@unit-api' }, async ({ session }) => {
+    // Arrange
+    const client = session.api({
+      baseURL: config.get('reqResBaseUrl') as string,
+      defaultHeaders: {
+        'x-api-key': config.get('reqResApiKey') as string,
+      },
+    })
 
-      // Act
-      const response = await session.apiSend(client, getUserRequest);
+    const getUserRequest = await RequestBuilder.get('/api/users').build()
 
-      // Assert
-      await ResponseValidator.expectStatus(response, 200);
-    },
-  );
+    // Act
+    const response = await session.apiSend(client, getUserRequest)
 
-  test(
-    "Fetch a single user by ID",
-    { tag: "@unit-api" },
-    async ({ session }) => {
-      // Arrange
-      const client = session.api({
-        baseURL: config.get("reqResBaseUrl") as string,
-        defaultHeaders: {
-          "x-api-key": config.get("reqResApiKey") as string,
-        },
-      });
+    // Assert
+    await ResponseValidator.expectStatus(response, 200)
+  })
 
-      const getSpecificUserRequest =
-        await RequestBuilder.get("/api/users/1").build();
+  test('Fetch a single user by ID', { tag: '@unit-api' }, async ({ session }) => {
+    // Arrange
+    const client = session.api({
+      baseURL: config.get('reqResBaseUrl') as string,
+      defaultHeaders: {
+        'x-api-key': config.get('reqResApiKey') as string,
+      },
+    })
 
-      // Act
-      const response = await session.apiSend(client, getSpecificUserRequest);
+    const getSpecificUserRequest = await RequestBuilder.get('/api/users/1').build()
 
-      // Assert
-      await ResponseValidator.expectStatus(response, 200);
-    },
-  );
-});
+    // Act
+    const response = await session.apiSend(client, getSpecificUserRequest)
+
+    // Assert
+    await ResponseValidator.expectStatus(response, 200)
+  })
+})
