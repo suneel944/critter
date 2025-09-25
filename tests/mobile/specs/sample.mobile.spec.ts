@@ -1,24 +1,31 @@
-import { test, expect } from "../../fixtures/session";
-import { CapabilityBuilder } from "../../../src/framework/capabilities/CapabilityBuilder";
-import type { Caps } from "../../../src/framework/capabilities/CapabilityBuilder";
+// tests/mobile/specs/sample.mobile.spec.ts
 
-let caps: Caps;
+import { CapabilityBuilder, type Caps } from '@critter'
+import { test, expect } from '@playwright/test'
 
-test.beforeAll(async () => {
+import { createMobileDriver, releaseMobileDriver } from '../session'
+
+let caps: Caps
+
+test.beforeAll(() => {
+  // Example Android mobile-web session targeting Chrome
   caps = CapabilityBuilder.android()
-    .browserName("Chrome")
-    .udid("10AD7N1862001AS")
-    .platformVersion("15.0")
-    .build();
-});
+    .browserName('Chrome')
+    .udid('10AD7N1862001AS')
+    .platformVersion('15.0')
+    .build()
+})
 
-test(
-  "Can launch Chrome on device",
-  { tag: "@android" },
-  async ({ session }) => {
-    const adapter = await session.mobile(caps, { provider: "local" });
-    await adapter.navigate("https://example.com");
-    const title = String(await adapter.execute("title"));
-    expect(title.toLowerCase()).toContain("example");
-  },
-);
+test('Can launch Chrome on device', { tag: '@android' }, async () => {
+  // Use the raw driver for mobile-web URL navigation/title check     // <-- your device ids
+  const { driver } = await createMobileDriver(caps)
+
+  try {
+    await driver.url('https://example.com')
+    const title = await driver.getTitle()
+    expect(title.toLowerCase()).toContain('example')
+  } finally {
+    // Always release the session via the broker-aware helper
+    await releaseMobileDriver(driver)
+  }
+})
