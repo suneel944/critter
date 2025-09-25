@@ -2,7 +2,6 @@
 
 <p align="center"><img width="520" height="520" alt="critter" src="https://github.com/user-attachments/assets/f6e59ef4-bd88-4b77-92e3-0ddad055c1e8" /></p>
 
-
 Critter is an enterprise‑grade automation framework designed to test web, API, and mobile applications in a cloud‑agnostic manner. It combines the power of [Playwright](https://playwright.dev/) for web and API testing with [WebdriverIO](https://webdriver.io/) and [Appium](https://appium.io/) for mobile testing. The framework supports running against local device farms as well as cloud providers such as BrowserStack and Sauce Labs.
 
 ## Features
