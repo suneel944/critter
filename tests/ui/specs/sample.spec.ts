@@ -1,22 +1,16 @@
-import { test, expect } from "../../fixtures/session";
-import { ConfigManager } from "../../../src/framework";
+import { ConfigManager } from '@critter'
 
-let config: ConfigManager;
+import { test, expect } from '../../fixtures/session'
 
-test.beforeAll(async () => {
-  config = ConfigManager.getInstance();
-});
+let config: ConfigManager
 
-// Sample Playwright UI test.  This test simply navigates to the base URL and
-// asserts that the page loads.  Replace with your own tests and page objects.
+test.beforeAll(() => {
+  config = ConfigManager.getInstance()
+})
 
-test(
-  "sample home page loads",
-  { tag: ["@unit-ui"] },
-  async function ({ session }) {
-    const adapter = await session.web();
-    await adapter.navigate(String(config.get("exampleBaseUrl")));
-    const title = String(await adapter.execute("title"));
-    expect(title).toMatch(/Example/);
-  },
-);
+test('sample home page loads', { tag: ['@unit-ui'] }, async ({ session }) => {
+  const adapter = await session.web()
+  await adapter.navigate(String(config.get('exampleBaseUrl')))
+  const title = String(await adapter.execute('title'))
+  expect(title).toMatch(/Example/)
+})
