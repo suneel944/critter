@@ -5,7 +5,7 @@ import { BasePage } from '../BasePage'
 import type { Page } from '@playwright/test'
 
 export class AutomationExercise extends BasePage {
-  constructor(readonly page: Page) {
+  constructor(page: Page) {
     super(page)
   }
 
