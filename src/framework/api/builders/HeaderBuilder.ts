@@ -16,7 +16,7 @@
  */
 export default class HeaderBuilder {
   /** Internal header map (lowercased keys). */
-  private h: Record<string, string> = {};
+  private h: Record<string, string> = {}
 
   /**
    * Add a single header (key will be normalized to lowercase).
@@ -26,8 +26,8 @@ export default class HeaderBuilder {
    * @returns The builder for chaining.
    */
   add(name: string, value: string) {
-    this.h[name.toLowerCase()] = value;
-    return this;
+    this.h[name.toLowerCase()] = value
+    return this
   }
 
   /**
@@ -42,8 +42,8 @@ export default class HeaderBuilder {
    * ```
    */
   addAll(obj: Record<string, string> = {}) {
-    for (const [k, v] of Object.entries(obj)) this.add(k, v);
-    return this;
+    for (const [k, v] of Object.entries(obj)) this.add(k, v)
+    return this
   }
 
   /**
@@ -52,6 +52,6 @@ export default class HeaderBuilder {
    * @returns A record of all accumulated headers with lowercase keys.
    */
   build() {
-    return this.h;
+    return this.h
   }
 }
