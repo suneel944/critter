@@ -6,13 +6,42 @@
     "lib": ["ES2023", "DOM"],
     "outDir": "dist",
     "rootDir": ".",
+
     "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+
     "types": ["node", "@playwright/test", "@wdio/globals/types", "@wdio/types"],
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@critter": ["src/framework/index.ts"],
+      "@critter/*": ["src/framework/*"],
+      "@critter/adapters/*": ["src/framework/adapters/*"],
+      "@critter/api/*": ["src/framework/api/*"],
+      "@critter/brokers/*": ["src/framework/brokers/*"],
+      "@critter/capabilities/*": ["src/framework/capabilities/*"],
+      "@critter/config/*": ["src/framework/config/*"],
+      "@critter/factories/*": ["src/framework/factories/*"],
+      "@critter/logging/*": ["src/framework/logging/*"],
+      "@critter/providers/*": ["src/framework/providers/*"],
+      "@critter/shared/*": ["src/framework/shared/*"]
+    }
   },
-  "include": ["src", "tests", "config", "playwright.config.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "src",
+    "tests",
+    "config",
+    "scripts/**/*.ts",
+    "playwright.config.ts",
+    "types.d.ts",
+    "**/*.d.ts"
+  ],
+  "exclude": ["node_modules", "dist", "build", "coverage"]
 }
