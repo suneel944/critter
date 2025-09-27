@@ -1,3 +1,5 @@
+import ConfigManager from "../config/ConfigManager"
+
 /**
  * Final (immutable) capabilities shape exposed to callers.
  *
@@ -17,7 +19,7 @@ export type Caps = Readonly<Record<string, unknown>>
 type MutableCaps = {
   browserName?: string
   platformName?: string
-  "appium:automationName"?: string
+  'appium:automationName'?: string
   [key: string]: unknown
 }
 
@@ -25,7 +27,7 @@ type MutableCaps = {
  * Narrow unknown to a plain object (record).
  */
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null && !Array.isArray(v)
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
 
 /**
@@ -61,8 +63,10 @@ function safeJsonParse(s: string): unknown {
  */
 export class CapabilityBuilder {
   private caps: MutableCaps
+  private cfg: Record<string, unknown>
 
   private constructor(base: MutableCaps) {
+    this.cfg = ConfigManager.getInstance().getAll() as Record<string, unknown>
     this.caps = { ...base }
   }
 
@@ -71,12 +75,10 @@ export class CapabilityBuilder {
    *
    * @param automationName - Automation backend to use (`UiAutomator2` or `Espresso`).
    */
-  static android(
-    automationName: "UiAutomator2" | "Espresso" = "UiAutomator2",
-  ): CapabilityBuilder {
+  static android(automationName: 'UiAutomator2' | 'Espresso' = 'UiAutomator2'): CapabilityBuilder {
     return new CapabilityBuilder({
-      platformName: "Android",
-      "appium:automationName": automationName,
+      platformName: 'Android',
+      'appium:automationName': automationName,
     })
   }
 
@@ -85,10 +87,10 @@ export class CapabilityBuilder {
    *
    * @param automationName - Automation backend to use (`XCUITest`).
    */
-  static ios(automationName: "XCUITest" = "XCUITest"): CapabilityBuilder {
+  static ios(automationName: 'XCUITest' = 'XCUITest'): CapabilityBuilder {
     return new CapabilityBuilder({
-      platformName: "iOS",
-      "appium:automationName": automationName,
+      platformName: 'iOS',
+      'appium:automationName': automationName,
     })
   }
 
@@ -96,49 +98,49 @@ export class CapabilityBuilder {
 
   /** Platform version (e.g. "14.0"). */
   platformVersion(v: string) {
-    this.caps["appium:platformVersion"] = v
+    this.caps['appium:platformVersion'] = v
     return this
   }
 
   /** Device name (e.g. "Pixel_8"). */
   deviceName(v: string) {
-    this.caps["appium:deviceName"] = v
+    this.caps['appium:deviceName'] = v
     return this
   }
 
   /** Device UDID (for physical devices). */
   udid(v: string) {
-    this.caps["appium:udid"] = v
+    this.caps['appium:udid'] = v
     return this
   }
 
   /** Device orientation (portrait or landscape). */
-  orientation(v: "PORTRAIT" | "LANDSCAPE") {
-    this.caps["appium:orientation"] = v
+  orientation(v: 'PORTRAIT' | 'LANDSCAPE') {
+    this.caps['appium:orientation'] = v
     return this
   }
 
   /** Language code (ISO format). */
   language(v: string) {
-    this.caps["appium:language"] = v
+    this.caps['appium:language'] = v
     return this
   }
 
   /** Locale code (ISO format). */
   locale(v: string) {
-    this.caps["appium:locale"] = v
+    this.caps['appium:locale'] = v
     return this
   }
 
   /** Prevent app reset between sessions. */
   noReset(v = true) {
-    this.caps["appium:noReset"] = v
+    this.caps['appium:noReset'] = v
     return this
   }
 
   /** Force a full app reset between sessions. */
   fullReset(v = true) {
-    this.caps["appium:fullReset"] = v
+    this.caps['appium:fullReset'] = v
     return this
   }
 
@@ -146,25 +148,25 @@ export class CapabilityBuilder {
 
   /** Path or identifier of the app under test. */
   app(path: string) {
-    this.caps["appium:app"] = path
+    this.caps['appium:app'] = path
     return this
   }
 
   /** iOS bundle identifier. */
   bundleId(v: string) {
-    this.caps["appium:bundleId"] = v
+    this.caps['appium:bundleId'] = v
     return this
   }
 
   /** Android app package name. */
   appPackage(v: string) {
-    this.caps["appium:appPackage"] = v
+    this.caps['appium:appPackage'] = v
     return this
   }
 
   /** Android app activity name. */
   appActivity(v: string) {
-    this.caps["appium:appActivity"] = v
+    this.caps['appium:appActivity'] = v
     return this
   }
 
@@ -174,7 +176,7 @@ export class CapabilityBuilder {
    * Browser name for mobile web testing.
    * Overloads give IntelliSense for common values while allowing any string.
    */
-  browserName(v: "Chrome" | "Chromium" | "Safari"): this
+  browserName(v: 'Chrome' | 'Chromium' | 'Safari'): this
   browserName(v: string): this
   browserName(v: string) {
     this.caps.browserName = v
@@ -221,7 +223,7 @@ export class CapabilityBuilder {
    * @param envVar - Environment variable name containing JSON.
    */
   fromEnvJSON(envVar: string) {
-    const raw = process.env[envVar]
+    const raw = this.cfg[envVar] as string
     if (raw) {
       const parsed: unknown = safeJsonParse(raw)
       if (isRecord(parsed)) this.merge(parsed)
@@ -246,7 +248,7 @@ export class CapabilityBuilder {
    * @param envVar - Environment variable name containing JSON.
    */
   vendorFromEnv(ns: string, envVar: string) {
-    const raw = process.env[envVar]
+    const raw = this.cfg[envVar] as string
     if (raw) {
       const parsed: unknown = safeJsonParse(raw)
       if (isRecord(parsed)) this.vendor(ns, parsed)

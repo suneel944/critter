@@ -2,36 +2,60 @@
   "name": "critter",
   "version": "1.0.0",
   "description": "Enterprise grade unified automation framework supporting web, API and mobile testing via Playwright and WebDriverIO/Appium.",
-  "main": "dist/index.js",
-  "scripts": {
-    "clean": "node -e \"try{require('fs').rmSync('dist',{recursive:true,force:true})}catch(e){}; try{require('fs').rmSync('reports',{recursive:true,force:true})}catch(e){}\"",
-    "build": "tsc -p .",
-    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
-    "lint:strict": "eslint src tests --ext .ts,.tsx --max-warnings=0",
-    "lint:fix": "eslint . --ext .ts,.tsx --fix",
-    "format": "prettier \"**/*.{ts,tsx,js,json,md,yml,yaml}\" --write",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:unit": "cross-env TEST_ENVIRONMENT=dev npx playwright test --grep @unit",
-    "test:smoke": "playwright test --reporter=line --grep @smoke",
-    "test:ui": "cross-env TEST_ENVIRONMENT=dev npx playwright test tests/ui/specs",
-    "test:api": "cross-env TEST_ENVIRONMENT=dev npx playwright test tests/api/specs",
-    "test": "npm run test:ui && npm run test:api",
-    "allure:clean": "node -e \"try{require('fs').rmSync('reports/allure/allure-report',{recursive:true,force:true})}catch(e){}\"",
-    "allure:gen": "allure generate reports/allure/allure-results --clean -o reports/allure/allure-report",
-    "allure:open": "allure open reports/allure/allure-report",
-    "test:allure": "cross-env TEST_ENVIRONMENT=dev npx playwright test && npm run allure:gen && npm run allure:open",
-    "appium": "appium"
-  },
+  "license": "MIT",
+  "author": "",
   "repository": {
     "type": "git",
     "url": ""
   },
-  "author": "",
-  "license": "MIT",
+  "engines": {
+    "node": ">=18.18"
+  },
+  "main": "dist/src/framework/index.js",
+  "types": "dist/src/framework/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/src/framework/index.js",
+      "types": "./dist/src/framework/index.d.ts"
+    }
+  },
+  "files": [
+    "dist/**",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "clean": "node -e \"try{require('fs').rmSync('dist',{recursive:true,force:true})}catch(e){}; try{require('fs').rmSync('reports',{recursive:true,force:true})}catch(e){}\"",
+    "build": "tsc -p tsconfig.build.json",
+    "postbuild": "tsc-alias -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --ext .ts,.tsx --max-warnings=0",
+    "lint:strict": "eslint src tests --ext .ts,.tsx --max-warnings=0",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "format": "prettier \"**/*.{ts,tsx,js,json,md,yml,yaml}\" --write",
+    "test:unit": "cross-env TEST_ENVIRONMENT=dev npx playwright test --grep @unit",
+    "test:smoke": "npx playwright test --reporter=line --grep @smoke",
+    "test": "npm run test:ui && npm run test:api",
+    "test:ui": "cross-env TEST_ENVIRONMENT=dev npx playwright test tests/ui/specs",
+    "test:api": "cross-env TEST_ENVIRONMENT=dev npx playwright test tests/api/specs",
+    "allure:clean": "node -e \"try{require('fs').rmSync('reports/allure/allure-report',{recursive:true,force:true})}catch(e){}\"",
+    "allure:gen": "allure generate reports/allure/allure-results --clean -o reports/allure/allure-report",
+    "allure:open": "allure open reports/allure/allure-report",
+    "test:allure": "cross-env TEST_ENVIRONMENT=dev npx playwright test && npm run allure:gen && npm run allure:open",
+    "appium": "appium",
+    "prepare": "lefthook install",
+    "prepublishOnly": "npm run clean && npm run build && npm run typecheck && npm run lint"
+  },
   "dependencies": {
     "ajv": "^8.17.1",
     "dotenv": "^17.2.1",
-    "pino": "^9.9.0"
+    "pino": "^9.9.0",
+    "ts-node": "10.9.2"
+  },
+  "peerDependencies": {
+    "playwright": "^1.55.0",
+    "webdriverio": "^9.19.2"
   },
   "devDependencies": {
     "@appium/images-plugin": "^4.0.0",
@@ -51,12 +75,16 @@
     "cross-env": "^10.0.0",
     "eslint": "^9.34.0",
     "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-boundaries": "^5.0.1",
+    "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-playwright": "^2.2.2",
     "globals": "^16.3.0",
     "lefthook": "^1.12.3",
     "playwright": "^1.55.0",
     "prettier": "^3.6.2",
-    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.10",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.42.0",

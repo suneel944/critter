@@ -1,5 +1,6 @@
-import { Page } from "@playwright/test"
-import { BasePage } from "../BasePage"
+import { BasePage } from '../BasePage'
+import type { Page } from '@playwright/test'
+
 
 /**
  * CartPage models the shopping cart view.  It exposes
@@ -14,7 +15,7 @@ export class CartPage extends BasePage {
   }
 
   // Selectors
-  private readonly checkOutButton = ".check_out"
+  private readonly checkOutButton = '.check_out'
 
   /**
    * Verify that the cart contains a product by its name.  Returns
@@ -22,7 +23,7 @@ export class CartPage extends BasePage {
    * provided text.  You can use this assertion in your tests.
    */
   async hasProduct(productName: string): Promise<boolean> {
-    const rows = this.page.locator("tr")
+    const rows = this.page.locator('tr')
     const count = await rows.filter({ hasText: productName }).count()
     return count > 0
   }

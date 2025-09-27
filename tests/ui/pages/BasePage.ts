@@ -1,5 +1,6 @@
-import type { Page } from "@playwright/test"
-import { ConfigManager } from "../../../src/framework"
+import { ConfigManager } from '@critter'
+
+import type { Page } from '@playwright/test'
 
 export class BasePage {
   protected readonly page: Page

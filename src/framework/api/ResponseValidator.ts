@@ -1,5 +1,5 @@
-import type { APIResponse } from "playwright"
-import Logger from "../shared/logger"
+import Logger from '../logging/Logger'
+import type { APIResponse } from 'playwright'
 
 /**
  * Minimal structural types for Ajv integration.
@@ -35,16 +35,11 @@ export default class ResponseValidator {
    * await ResponseValidator.expectStatus(res, 200)
    * ```
    */
-  public static async expectStatus(
-    response: APIResponse,
-    expected: number,
-  ): Promise<void> {
+  public static async expectStatus(response: APIResponse, expected: number): Promise<void> {
     const actual = response.status()
     if (actual !== expected) {
       const text = await response.text()
-      throw new Error(
-        `Expected status ${expected}, but got ${actual}. Response body: ${text}`,
-      )
+      throw new Error(`Expected status ${expected}, but got ${actual}. Response body: ${text}`)
     }
   }
 
@@ -85,26 +80,23 @@ export default class ResponseValidator {
    * await ResponseValidator.validateSchema(res, schema)
    * ```
    */
-  public static async validateSchema(
-    response: APIResponse,
-    schema: unknown,
-  ): Promise<void> {
+  public static async validateSchema(response: APIResponse, schema: unknown): Promise<void> {
     let AjvCtor: AjvCtorLike | undefined
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const mod: unknown = require("ajv")
+      const mod: unknown = require('ajv')
       AjvCtor = extractAjvCtor(mod)
     } catch (err) {
       if (isModuleNotFoundError(err)) {
-        Logger.warn("AJV not installed skipping schema validation.")
+        Logger.warn('AJV not installed skipping schema validation.')
         return
       }
       throw err
     }
 
     if (!AjvCtor) {
-      Logger.warn("AJV module shape not recognized skipping schema validation.")
+      Logger.warn('AJV module shape not recognized skipping schema validation.')
       return
     }
 
@@ -126,24 +118,24 @@ export default class ResponseValidator {
  * Check if a value is a plain object.
  */
 function isObject(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null
+  return typeof v === 'object' && v !== null
 }
 
 /**
  * Check if a module export has a `default` property.
  */
 function hasDefault(v: unknown): v is { default: unknown } {
-  return isObject(v) && "default" in v
+  return isObject(v) && 'default' in v
 }
 
 /**
  * Check if a value looks like a valid Ajv constructor.
  */
 function isAjvCtorLike(v: unknown): v is AjvCtorLike {
-  if (typeof v !== "function") return false
+  if (typeof v !== 'function') return false
   try {
     const inst = new (v as new () => { compile?: unknown })()
-    return typeof inst.compile === "function"
+    return typeof inst.compile === 'function'
   } catch {
     return false
   }
@@ -164,8 +156,8 @@ function extractAjvCtor(mod: unknown): AjvCtorLike | undefined {
 function isModuleNotFoundError(e: unknown): e is { code: string } {
   return (
     isObject(e) &&
-    typeof (e as { code?: unknown }).code === "string" &&
-    (e as { code: string }).code === "MODULE_NOT_FOUND"
+    typeof (e as { code?: unknown }).code === 'string' &&
+    (e as { code: string }).code === 'MODULE_NOT_FOUND'
   )
 }
 

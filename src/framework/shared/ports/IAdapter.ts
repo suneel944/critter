@@ -92,10 +92,7 @@ export interface IAdapter<
    * const t = await adapter.execute("title")                  // params omitted
    * ```
    */
-  execute<A extends TActions>(
-    action: A,
-    params?: TParams[A],
-  ): Promise<TResults[A]>
+  execute<A extends TActions>(action: A, params?: TParams[A]): Promise<TResults[A]>
 
   /**
    * Graceful cleanup.

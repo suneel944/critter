@@ -1,5 +1,4 @@
-import type { Browser } from "webdriverio"
-import type { CapabilityBuilder, Caps } from "../capabilities/CapabilityBuilder"
+import type { Browser } from 'webdriverio'
 
 /**
  * Generic key–value options bag for provider-specific configuration.
@@ -16,7 +15,7 @@ export type MobileSession = { driver: Browser }
 /**
  * Supported mobile platforms that a provider can launch sessions for.
  */
-export type Platform = "android" | "ios"
+export type Platform = 'android' | 'ios'
 
 /**
  * Union of acceptable inputs for requesting a mobile driver session:
@@ -24,8 +23,7 @@ export type Platform = "android" | "ios"
  *  - `Caps` strongly-typed Appium/WebdriverIO capability object
  *  - `CapabilityBuilder` fluent builder used inside the framework
  */
-export type MobileCapsInput = ProviderOptions | Caps | CapabilityBuilder
-
+export type MobileCapsInput = ProviderOptions
 /**
  * Contract that all device providers (e.g. BrowserStack, Sauce Labs, Local Farm)
  * must implement in order to integrate with the Critter framework.

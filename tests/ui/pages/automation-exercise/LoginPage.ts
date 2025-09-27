@@ -1,5 +1,6 @@
-import { Page } from "@playwright/test"
-import { BasePage } from "../BasePage"
+import { BasePage } from '../BasePage'
+import type { Page } from '@playwright/test'
+
 
 /**
  * LoginPage models the login form on Automation Exercise.
@@ -15,7 +16,7 @@ export class LoginPage extends BasePage {
 
   // Selectors
   private readonly loginLink = "a[href='/login']"
-  private readonly editField = (fieldName: "email" | "password"): string =>
+  private readonly editField = (fieldName: 'email' | 'password'): string =>
     `input[data-qa="login-${fieldName}"]`
   private readonly loginSubmitButton = "button[data-qa='login-button']"
 
@@ -32,8 +33,8 @@ export class LoginPage extends BasePage {
    * @param password Registered user’s password
    */
   async login(email: string, password: string): Promise<void> {
-    await this.page.fill(this.editField("email"), email)
-    await this.page.fill(this.editField("password"), password)
+    await this.page.fill(this.editField('email'), email)
+    await this.page.fill(this.editField('password'), password)
     await this.page.click(this.loginSubmitButton)
   }
 }

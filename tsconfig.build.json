@@ -1,0 +1,9 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "noEmit": false
+    },
+    "include": ["src", "config", "playwright.config.ts"],
+    "exclude": ["tests", "scripts", "node_modules", "dist", "build", "coverage"]
+  }
+  

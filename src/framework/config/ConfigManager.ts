@@ -1,6 +1,6 @@
-import { resolve } from "path"
-import { existsSync, readFileSync } from "fs"
-import dotenv from "dotenv"
+import dotenv from 'dotenv'
+import { existsSync, readFileSync } from 'fs'
+import { resolve } from 'path'
 
 /**
  * Base configuration keys that are known and strongly typed.
@@ -32,14 +32,14 @@ export type EnvironmentConfig = BaseConfig & Record<string, unknown>
  * Type guard for plain objects (non-null, non-array).
  */
 function isRecord(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null && !Array.isArray(v)
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
 }
 
 /**
  * Type guard for CommonJS/ESM modules with a `default` export.
  */
 function hasDefault(v: unknown): v is { default: unknown } {
-  return isRecord(v) && "default" in v
+  return isRecord(v) && 'default' in v
 }
 
 /**
@@ -71,31 +71,19 @@ export default class ConfigManager {
    */
   private constructor() {
     dotenv.config()
-    this.env = process.env.TEST_ENVIRONMENT || process.env.APP_ENV || "dev"
+    this.env = process.env.TEST_ENVIRONMENT || process.env.APP_ENV || 'dev'
 
     const root = process.env.CONFIG_ROOT
       ? resolve(process.cwd(), process.env.CONFIG_ROOT)
-      : resolve(process.cwd(), "config", "environments")
+      : resolve(process.cwd(), 'config', 'environments')
 
     // Candidate config files in priority order
     const tsPath = resolve(root, `${this.env}.ts`)
     const jsPath = resolve(root, `${this.env}.js`)
     const cjsPath = resolve(root, `${this.env}.cjs`)
     const jsonPath = resolve(root, `${this.env}.json`)
-    const distJs = resolve(
-      process.cwd(),
-      "dist",
-      "config",
-      "environments",
-      `${this.env}.js`,
-    )
-    const distCjs = resolve(
-      process.cwd(),
-      "dist",
-      "config",
-      "environments",
-      `${this.env}.cjs`,
-    )
+    const distJs = resolve(process.cwd(), 'dist', 'config', 'environments', `${this.env}.js`)
+    const distCjs = resolve(process.cwd(), 'dist', 'config', 'environments', `${this.env}.cjs`)
 
     const cfg = this.loadConfigFromFirstExisting([
       tsPath,
@@ -161,8 +149,8 @@ export default class ConfigManager {
       if (!existsSync(p)) continue
 
       const lower = p.toLowerCase()
-      if (lower.endsWith(".json")) {
-        const raw = readFileSync(p, "utf-8")
+      if (lower.endsWith('.json')) {
+        const raw = readFileSync(p, 'utf-8')
         let parsed: unknown
         try {
           parsed = JSON.parse(raw)
@@ -172,11 +160,11 @@ export default class ConfigManager {
         return this.validate(parsed, p)
       }
 
-      if (lower.endsWith(".ts")) {
+      if (lower.endsWith('.ts')) {
         // Register ts-node on the fly for TS configs in dev.
         try {
           // eslint-disable-next-line @typescript-eslint/no-require-imports
-          require("ts-node/register/transpile-only")
+          require('ts-node/register/transpile-only')
         } catch {
           // If ts-node isn't available, user should run via ts-node/tsx or build first.
         }
@@ -186,7 +174,7 @@ export default class ConfigManager {
         return this.validate(exp, p)
       }
 
-      if (lower.endsWith(".js") || lower.endsWith(".cjs")) {
+      if (lower.endsWith('.js') || lower.endsWith('.cjs')) {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const mod = require(p) as unknown
         const exp = hasDefault(mod) ? mod.default : mod
@@ -195,7 +183,7 @@ export default class ConfigManager {
     }
 
     throw new Error(
-      `Environment config not found for '${this.env}'. Looked for: ${paths.map((s) => `- ${s}`).join("\n")}`,
+      `Environment config not found for '${this.env}'. Looked for: ${paths.map((s) => `- ${s}`).join('\n')}`,
     )
   }
 
@@ -209,9 +197,7 @@ export default class ConfigManager {
    */
   private validate(candidate: unknown, sourcePath: string): EnvironmentConfig {
     if (!isRecord(candidate)) {
-      throw new Error(
-        `Invalid config object in ${sourcePath}: expected a plain object`,
-      )
+      throw new Error(`Invalid config object in ${sourcePath}: expected a plain object`)
     }
     return candidate as EnvironmentConfig
   }

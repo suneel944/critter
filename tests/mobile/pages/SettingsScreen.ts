@@ -1,11 +1,11 @@
-import { $ } from "@wdio/globals"
+import { $ } from '@wdio/globals'
 
 export class SettingsScreen {
   private get themeToggle() {
-    return $("~themeToggle")
+    return $('~themeToggle')
   }
   private get logoutButton() {
-    return $("~logoutButton")
+    return $('~logoutButton')
   }
 
   async toggleTheme(): Promise<void> {
